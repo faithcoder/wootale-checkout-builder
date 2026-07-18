@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<ruleset name="WooTale Checkout Builder">
+	<description>WordPress Coding Standards for WooTale Checkout Builder.</description>
+	<file>wootale-checkout-builder.php</file>
+	<file>includes</file>
+	<file>tests/php</file>
+	<exclude-pattern>vendor/*</exclude-pattern>
+	<rule ref="WordPress"/>
+</ruleset>
