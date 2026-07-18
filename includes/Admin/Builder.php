@@ -112,12 +112,14 @@ final class Builder {
 		echo '<input type="hidden" name="action" value="wtcb_save_builder" />';
 		echo '<textarea id="wtcb-workflow-input" name="wtcb_workflow" hidden>' . esc_textarea( wp_json_encode( $workflow ) ) . '</textarea>';
 		$this->render_global_settings_panel( $workflow );
+		echo '<div id="wtcb-builder-view">';
 		echo '<div class="wtcb-builder-shell">';
 		$this->render_component_panel();
 		$this->render_steps_panel( $workflow );
 		$this->render_settings_panel( $workflow );
 		echo '</div>';
 		$this->render_footer_stats( $workflow );
+		echo '</div>';
 		$this->render_field_settings_modal();
 		echo '</form>';
 		$this->render_scripts( $workflow );
@@ -126,9 +128,9 @@ final class Builder {
 
 	private function render_header( string $checkout_url ): void {
 		echo '<div class="wtcb-topbar">';
-		echo '<div class="wtcb-brand"><span class="wtcb-logo">WT</span><h1><strong>WooTale</strong> <span>Checkout Builder</span></h1></div>';
-		echo '<nav class="wtcb-tabs"><a class="is-active" data-wtcb-tab="builder">Builder</a><a>Fields</a><a data-wtcb-tab="settings">Settings</a><a>Rules</a><a>Analytics <span>Pro</span></a><a>Extensions <span>Pro</span></a></nav>';
-		echo '<div class="wtcb-actions"><a class="button" href="https://wootale.com/docs" target="_blank" rel="noreferrer">Docs</a><a class="button" href="' . esc_url( $checkout_url ) . '" target="_blank" rel="noreferrer">Preview Checkout</a><button class="button button-primary" type="submit" form="wtcb-builder-form">Save Changes</button></div>';
+		echo '<div class="wtcb-topbar-main"><div class="wtcb-brand"><span class="wtcb-logo">WT</span><h1><strong>WooTale</strong> <span>Checkout Builder</span></h1></div>';
+		echo '<div class="wtcb-actions"><a class="button" href="https://wootale.com/docs" target="_blank" rel="noreferrer">Docs</a><a class="button" href="' . esc_url( $checkout_url ) . '" target="_blank" rel="noreferrer">Preview Checkout</a><button class="button button-primary" type="submit" form="wtcb-builder-form">Save Changes</button></div></div>';
+		echo '<nav class="wtcb-tabs"><a class="is-active" data-wtcb-tab="builder">Classic Builder</a><a>Block Builder</a><a>Fields</a><a data-wtcb-tab="settings">Settings</a><a>Rules</a><a>Analytics <span>Pro</span></a><a>Extensions <span>Pro</span></a></nav>';
 		echo '</div>';
 	}
 
@@ -145,7 +147,7 @@ final class Builder {
 		$multi_step_enabled = ! array_key_exists( 'multiStepEnabled', $workflow ) || ! empty( $workflow['multiStepEnabled'] );
 
 		echo '<section class="wtcb-card wtcb-global-settings" id="wtcb-global-settings" hidden>';
-		echo '<div class="wtcb-global-settings__head"><div><h2>' . esc_html__( 'Checkout Settings', 'wootale-checkout-builder' ) . '</h2><p>' . esc_html__( 'Control the checkout workflow and step navigation.', 'wootale-checkout-builder' ) . '</p></div><label class="wtcb-switch-row"><span><strong>' . esc_html__( 'Enable Multi Step', 'wootale-checkout-builder' ) . '</strong><small>' . esc_html__( 'Show customers a guided step flow instead of one continuous checkout.', 'wootale-checkout-builder' ) . '</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-multistep-enabled" ' . checked( $multi_step_enabled, true, false ) . ' /><span></span></label></label></div>';
+		echo '<div class="wtcb-global-settings__head"><div><h2>' . esc_html__( 'Checkout Settings', 'wootale-checkout-builder' ) . '</h2><p>' . esc_html__( 'Control the checkout workflow and step navigation.', 'wootale-checkout-builder' ) . '</p></div><div class="wtcb-global-settings__actions"><button type="button" class="button">Import</button><button type="button" class="button">Export</button></div><label class="wtcb-switch-row"><span><strong>' . esc_html__( 'Enable Multi Step', 'wootale-checkout-builder' ) . '</strong><small>' . esc_html__( 'Show customers a guided step flow instead of one continuous checkout.', 'wootale-checkout-builder' ) . '</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-multistep-enabled" ' . checked( $multi_step_enabled, true, false ) . ' /><span></span></label></label></div>';
 		echo '<div class="wtcb-multistep-controls" id="wtcb-multistep-controls" ' . ( $multi_step_enabled ? '' : 'hidden' ) . '>';
 		echo '<div><h3>Steps Number</h3><div class="wtcb-step-count"><button type="button" data-step-count-decrease>-</button><input type="number" id="wtcb-step-count" min="1" max="3" value="' . esc_attr( (string) count( $workflow['steps'] ) ) . '" /><button type="button" data-step-count-increase>+</button></div><p class="wtcb-small-note">Free workflows support up to 3 steps.</p></div>';
 		echo '<div><h3>Step Layout</h3><div class="wtcb-segment" data-setting-segment="orientation"><button type="button" data-value="horizontal" class="' . esc_attr( 'horizontal' === $orientation ? 'is-active' : '' ) . '">Horizontal</button><button type="button" data-value="vertical" class="' . esc_attr( 'vertical' === $orientation ? 'is-active' : '' ) . '">Vertical</button></div></div>';
@@ -224,7 +226,7 @@ final class Builder {
 	 * @param array<string,mixed> $workflow Workflow.
 	 */
 	private function render_steps_panel( array $workflow ): void {
-		echo '<main class="wtcb-card wtcb-canvas"><div class="wtcb-canvas-head"><h2>Checkout Steps <span>' . esc_html( count( $workflow['steps'] ) ) . ' / 3 Free</span></h2><div><button type="button" class="button">Import</button> <button type="button" class="button">Export</button></div></div>';
+		echo '<main class="wtcb-card wtcb-canvas"><div class="wtcb-canvas-head"><h2>Checkout Steps <span>' . esc_html( count( $workflow['steps'] ) ) . ' / 3 Free</span></h2></div>';
 		echo '<div id="wtcb-steps">';
 
 		foreach ( $workflow['steps'] as $index => $step ) {
@@ -337,10 +339,11 @@ final class Builder {
 	private function render_styles(): void {
 		echo '<style>
 		.wtcb-admin{--blue:#2563eb;--line:#dbeafe;--ink:#111827;--muted:#6b7280;max-width:1660px}
-		.wtcb-topbar{align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:10px;display:grid;gap:18px;grid-template-columns:auto 1fr auto;margin:16px 0;padding:16px}
+		.wtcb-topbar{background:#fff;border:1px solid #e5e7eb;border-radius:10px;display:grid;gap:14px;margin:16px 0;padding:16px}
+		.wtcb-topbar-main{align-items:center;display:flex;gap:18px;justify-content:space-between}
 		.wtcb-brand{align-items:center;display:flex;gap:12px}.wtcb-brand h1{font-size:22px;margin:0}.wtcb-brand span{font-weight:400}.wtcb-logo{align-items:center;border:2px solid var(--blue);border-radius:8px;color:var(--blue);display:inline-flex;font-size:11px;font-weight:700;height:30px;justify-content:center;width:30px}
-		.wtcb-tabs{display:flex;gap:24px}.wtcb-tabs a{color:#4b5563;text-decoration:none}.wtcb-tabs .is-active{border-bottom:2px solid var(--blue);color:var(--blue);padding-bottom:10px}.wtcb-tabs span,.wtcb-components h3 span{background:#ede9fe;border-radius:6px;color:#7c3aed;font-size:11px;padding:2px 6px}.wtcb-actions{display:flex;gap:8px}
-		.wtcb-global-settings{margin:0 0 20px}.wtcb-global-settings__head{align-items:center;display:flex;gap:20px;justify-content:space-between}.wtcb-global-settings__head h2{margin-bottom:4px}.wtcb-global-settings__head p{color:#6b7280;margin:0}.wtcb-multistep-controls{border-top:1px solid #e5e7eb;display:grid;gap:18px;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px;padding-top:16px}.wtcb-multistep-controls[hidden]{display:none}.wtcb-switch-row{align-items:center;background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;display:flex;gap:20px;justify-content:space-between;min-width:340px;padding:12px}.wtcb-switch-row>span{display:grid;gap:4px}.wtcb-switch-row small{color:#6b7280;font-weight:400}
+		.wtcb-tabs{border-top:1px solid #e5e7eb;display:flex;flex-wrap:wrap;gap:24px;padding-top:12px}.wtcb-tabs a{color:#4b5563;cursor:pointer;text-decoration:none}.wtcb-tabs .is-active{border-bottom:2px solid var(--blue);color:var(--blue);padding-bottom:10px}.wtcb-tabs span,.wtcb-components h3 span{background:#ede9fe;border-radius:6px;color:#7c3aed;font-size:11px;padding:2px 6px}.wtcb-actions{display:flex;gap:8px}
+		.wtcb-global-settings{margin:0 0 20px}.wtcb-global-settings__head{align-items:center;display:grid;gap:20px;grid-template-columns:1fr auto auto}.wtcb-global-settings__actions{display:flex;gap:8px}.wtcb-global-settings__head h2{margin-bottom:4px}.wtcb-global-settings__head p{color:#6b7280;margin:0}.wtcb-multistep-controls{border-top:1px solid #e5e7eb;display:grid;gap:18px;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px;padding-top:16px}.wtcb-multistep-controls[hidden]{display:none}.wtcb-switch-row{align-items:center;background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;display:flex;gap:20px;justify-content:space-between;min-width:340px;padding:12px}.wtcb-switch-row>span{display:grid;gap:4px}.wtcb-switch-row small{color:#6b7280;font-weight:400}
 		.wtcb-builder-shell{display:grid;gap:20px;grid-template-columns:320px minmax(520px,1fr) 320px}.wtcb-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:16px}.wtcb-card h2{font-size:16px;margin:0 0 14px}.wtcb-card h3{font-size:13px;margin:18px 0 10px}.wtcb-search,.wtcb-settings select,.wtcb-step input,.wtcb-global-settings select{border:1px solid #e5e7eb;border-radius:6px;box-sizing:border-box;width:100%}
 		.wtcb-component-grid{display:grid;gap:8px;grid-template-columns:1fr 1fr}.wtcb-component-grid button,.wtcb-component{background:#fff;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;padding:10px;text-align:left}.wtcb-component-grid.is-disabled button{color:#9ca3af}.wtcb-hint{background:#f9fafb;color:#6b7280;margin:16px -16px -16px;padding:12px 16px}
 		.wtcb-canvas-head{align-items:center;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;margin:-16px -16px 16px;padding:16px}.wtcb-canvas-head span{background:#dbeafe;border-radius:6px;color:#2563eb;font-size:12px;padding:2px 8px}
@@ -350,7 +353,7 @@ final class Builder {
 		.wtcb-setting-tabs{border-bottom:1px solid #e5e7eb;display:flex;gap:22px;margin:16px -16px;padding:0 16px 10px}.wtcb-setting-tabs .is-active{border-bottom:2px solid var(--blue);color:var(--blue)}.wtcb-segment{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(80px,1fr))}.wtcb-segment button,.wtcb-icons button,.wtcb-step-count button{background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:10px}.wtcb-segment .is-active,.wtcb-icons .is-active{border-color:#2563eb;color:#2563eb}.wtcb-icons{display:flex;gap:8px}.wtcb-settings label,.wtcb-global-settings label{display:flex;justify-content:space-between;margin:12px 0}.wtcb-settings select,.wtcb-global-settings select{min-height:38px}.wtcb-step-count{display:grid;gap:8px;grid-template-columns:42px 1fr 42px}.wtcb-step-count input{border:1px solid #e5e7eb;border-radius:6px;text-align:center}.wtcb-small-note{color:#6b7280;font-size:12px;margin:8px 0 0}.wtcb-delete-step{border-color:#fecaca!important;color:#dc2626!important;margin-top:16px;width:100%}
 		.wtcb-stats{display:grid;gap:16px;grid-template-columns:repeat(4,1fr);margin-top:20px}.wtcb-stats div{border-right:1px solid #e5e7eb;padding:8px 16px}.wtcb-stats div:last-child{border-right:0}.wtcb-stats strong,.wtcb-stats span{display:block}.wtcb-stats span{color:#4b5563;margin-top:8px}
 		.wtcb-modal{align-items:center;background:rgba(15,23,42,.45);bottom:0;display:flex;justify-content:center;left:0;position:fixed;right:0;top:0;z-index:100000}.wtcb-modal[hidden]{display:none}.wtcb-modal__panel{background:#fff;border-radius:10px;box-shadow:0 24px 80px rgba(15,23,42,.25);max-height:calc(100vh - 48px);max-width:900px;overflow:auto;width:min(900px,calc(100vw - 32px))}.wtcb-modal__head,.wtcb-modal__foot{align-items:center;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;padding:16px;position:sticky;top:0;z-index:1}.wtcb-modal__foot{border-bottom:0;border-top:1px solid #e5e7eb;bottom:0;gap:8px;justify-content:flex-end;top:auto}.wtcb-modal__head h2{font-size:18px;margin:0}.wtcb-modal__body{display:grid;gap:16px;padding:16px}.wtcb-modal-grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}.wtcb-modal__body label{display:grid;gap:6px;font-weight:600}.wtcb-modal__body input[type=text],.wtcb-modal__body select,.wtcb-modal__body textarea{border:1px solid #d1d5db;border-radius:6px;box-sizing:border-box;min-height:40px;padding:8px;width:100%}.wtcb-modal__body textarea{resize:vertical}.wtcb-modal__body select[multiple]{min-height:86px}.wtcb-toggle-row{align-items:center;background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;display:flex;justify-content:space-between;padding:14px}.wtcb-toggle-row span{display:grid;gap:4px}.wtcb-toggle-row small{color:#6b7280;font-weight:400}.wtcb-switch input{clip:rect(0,0,0,0);height:1px;position:absolute;width:1px}.wtcb-switch span{background:#cbd5e1;border-radius:999px;display:block;height:24px;position:relative;width:44px}.wtcb-switch span:before{background:#fff;border-radius:50%;content:"";height:18px;left:3px;position:absolute;top:3px;transition:.15s;width:18px}.wtcb-switch input:checked+span{background:#2563eb}.wtcb-switch input:checked+span:before{left:23px}.wtcb-native-lock-note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#1d4ed8;margin:0;padding:10px}
-		@media(max-width:1200px){.wtcb-builder-shell{grid-template-columns:1fr}.wtcb-topbar{grid-template-columns:1fr}.wtcb-stats,.wtcb-multistep-controls{grid-template-columns:1fr 1fr}}@media(max-width:700px){.wtcb-field-list,.wtcb-modal-grid,.wtcb-multistep-controls{grid-template-columns:1fr}.wtcb-width-1,.wtcb-width-2{grid-column:1/-1}.wtcb-global-settings__head{align-items:stretch;display:grid}.wtcb-switch-row{min-width:0}}
+		@media(max-width:1200px){.wtcb-builder-shell{grid-template-columns:1fr}.wtcb-topbar-main{align-items:flex-start;display:grid}.wtcb-stats,.wtcb-multistep-controls{grid-template-columns:1fr 1fr}.wtcb-global-settings__head{grid-template-columns:1fr}}@media(max-width:700px){.wtcb-field-list,.wtcb-modal-grid,.wtcb-multistep-controls{grid-template-columns:1fr}.wtcb-width-1,.wtcb-width-2{grid-column:1/-1}.wtcb-global-settings__head{align-items:stretch;display:grid}.wtcb-switch-row{min-width:0}}
 		</style>';
 	}
 
@@ -367,6 +370,7 @@ final class Builder {
 	var activeCard = null;
 	var steps = document.getElementById('wtcb-steps');
 	var input = document.getElementById('wtcb-workflow-input');
+	var builderView = document.getElementById('wtcb-builder-view');
 	var globalSettings = document.getElementById('wtcb-global-settings');
 	var multiStepEnabled = document.getElementById('wtcb-multistep-enabled');
 	var multiStepControls = document.getElementById('wtcb-multistep-controls');
@@ -599,6 +603,9 @@ final class Builder {
 			Array.prototype.forEach.call(document.querySelectorAll('[data-wtcb-tab]'), function(tab){
 				tab.classList.toggle('is-active', tab === topTab);
 			});
+			if (builderView) {
+				builderView.hidden = topTab.dataset.wtcbTab !== 'builder';
+			}
 			if (globalSettings) {
 				globalSettings.hidden = topTab.dataset.wtcbTab !== 'settings';
 			}
