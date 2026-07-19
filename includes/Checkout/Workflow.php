@@ -55,10 +55,27 @@ class Workflow {
 			'multiStepEnabled' => true,
 			'orientation'   => 'horizontal',
 			'indicator'     => 'number',
+			'stepIcon'      => '1',
 			'connector'     => 'solid',
-			'navigation'    => 'tabs',
+			'navigation'    => 'line',
 			'activeColor'   => '#2563eb',
 			'completedColor'=> '#16a34a',
+			'inactiveColor' => '#6b7280',
+			'connectorThickness' => 2,
+			'connectorGap'  => 24,
+			'previousText'  => 'Previous',
+			'nextText'      => 'Next',
+			'continueText'  => 'Continue',
+			'previousButtonColor' => '#1f2937',
+			'previousButtonBackground' => '#f5f6f7',
+			'nextButtonColor' => '#ffffff',
+			'nextButtonBackground' => '#2563eb',
+			'continueButtonColor' => '#ffffff',
+			'continueButtonBackground' => '#16a34a',
+			'allowCompletedStepNavigation' => true,
+			'scrollOnStepChange' => true,
+			'validateBeforeNext' => true,
+			'rememberStep'   => false,
 			'steps'         => array(
 				array(
 					'id'          => 'wtcb_step_customer_details',
@@ -126,10 +143,27 @@ class Workflow {
 			'multiStepEnabled' => ! array_key_exists( 'multiStepEnabled', $workflow ) || ! empty( $workflow['multiStepEnabled'] ),
 			'orientation'    => $this->sanitize_choice( isset( $workflow['orientation'] ) ? (string) $workflow['orientation'] : 'horizontal', array( 'horizontal', 'vertical' ), 'horizontal' ),
 			'indicator'      => $this->sanitize_choice( isset( $workflow['indicator'] ) ? (string) $workflow['indicator'] : 'number', array( 'number', 'icon', 'tab' ), 'number' ),
+			'stepIcon'       => $this->sanitize_choice( isset( $workflow['stepIcon'] ) ? (string) $workflow['stepIcon'] : '1', array( '1', 'user', 'flag', 'star', 'check' ), '1' ),
 			'connector'      => $this->sanitize_choice( isset( $workflow['connector'] ) ? (string) $workflow['connector'] : 'solid', array( 'solid', 'line', 'arrow', 'none' ), 'solid' ),
-			'navigation'     => $this->sanitize_choice( isset( $workflow['navigation'] ) ? (string) $workflow['navigation'] : 'tabs', array( 'tabs', 'buttons' ), 'tabs' ),
+			'navigation'     => $this->sanitize_navigation( isset( $workflow['navigation'] ) ? (string) $workflow['navigation'] : 'line' ),
 			'activeColor'    => $this->sanitize_color( isset( $workflow['activeColor'] ) ? (string) $workflow['activeColor'] : '#2563eb' ),
 			'completedColor' => $this->sanitize_color( isset( $workflow['completedColor'] ) ? (string) $workflow['completedColor'] : '#16a34a' ),
+			'inactiveColor'  => $this->sanitize_color( isset( $workflow['inactiveColor'] ) ? (string) $workflow['inactiveColor'] : '#6b7280' ),
+			'connectorThickness' => $this->sanitize_range( isset( $workflow['connectorThickness'] ) ? (int) $workflow['connectorThickness'] : 2, 1, 8, 2 ),
+			'connectorGap'   => $this->sanitize_range( isset( $workflow['connectorGap'] ) ? (int) $workflow['connectorGap'] : 24, 8, 64, 24 ),
+			'previousText'   => isset( $workflow['previousText'] ) ? sanitize_text_field( (string) $workflow['previousText'] ) : 'Previous',
+			'nextText'       => isset( $workflow['nextText'] ) ? sanitize_text_field( (string) $workflow['nextText'] ) : 'Next',
+			'continueText'   => isset( $workflow['continueText'] ) ? sanitize_text_field( (string) $workflow['continueText'] ) : 'Continue',
+			'previousButtonColor' => $this->sanitize_color( isset( $workflow['previousButtonColor'] ) ? (string) $workflow['previousButtonColor'] : '#1f2937' ),
+			'previousButtonBackground' => $this->sanitize_color( isset( $workflow['previousButtonBackground'] ) ? (string) $workflow['previousButtonBackground'] : '#f5f6f7' ),
+			'nextButtonColor' => $this->sanitize_color( isset( $workflow['nextButtonColor'] ) ? (string) $workflow['nextButtonColor'] : '#ffffff' ),
+			'nextButtonBackground' => $this->sanitize_color( isset( $workflow['nextButtonBackground'] ) ? (string) $workflow['nextButtonBackground'] : '#2563eb' ),
+			'continueButtonColor' => $this->sanitize_color( isset( $workflow['continueButtonColor'] ) ? (string) $workflow['continueButtonColor'] : '#ffffff' ),
+			'continueButtonBackground' => $this->sanitize_color( isset( $workflow['continueButtonBackground'] ) ? (string) $workflow['continueButtonBackground'] : '#16a34a' ),
+			'allowCompletedStepNavigation' => ! array_key_exists( 'allowCompletedStepNavigation', $workflow ) || ! empty( $workflow['allowCompletedStepNavigation'] ),
+			'scrollOnStepChange' => ! array_key_exists( 'scrollOnStepChange', $workflow ) || ! empty( $workflow['scrollOnStepChange'] ),
+			'validateBeforeNext' => ! array_key_exists( 'validateBeforeNext', $workflow ) || ! empty( $workflow['validateBeforeNext'] ),
+			'rememberStep'    => ! empty( $workflow['rememberStep'] ),
 			'steps'          => array(),
 		);
 
@@ -272,6 +306,16 @@ class Workflow {
 		return in_array( $value, $allowed, true ) ? $value : $fallback;
 	}
 
+	private function sanitize_navigation( string $value ): string {
+		$value = sanitize_key( $value );
+
+		if ( 'tabs' === $value ) {
+			return 'line';
+		}
+
+		return in_array( $value, array( 'line', 'buttons' ), true ) ? $value : 'line';
+	}
+
 	private function sanitize_textarea( string $value ): string {
 		if ( function_exists( 'sanitize_textarea_field' ) ) {
 			return sanitize_textarea_field( $value );
@@ -286,6 +330,14 @@ class Workflow {
 		}
 
 		return 2;
+	}
+
+	private function sanitize_range( int $value, int $min, int $max, int $fallback ): int {
+		if ( $value < $min || $value > $max ) {
+			return $fallback;
+		}
+
+		return $value;
 	}
 
 	private function sanitize_field_type( string $type ): string {

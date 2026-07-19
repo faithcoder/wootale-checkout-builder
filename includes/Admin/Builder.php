@@ -33,7 +33,43 @@ final class Builder {
 	 */
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'admin_post_wtcb_save_builder', array( $this, 'save' ) );
+		add_action( 'wp_ajax_wtcb_save_builder', array( $this, 'ajax_save' ) );
+	}
+
+	/**
+	 * Enqueue dashboard assets only on the WooTale builder screen.
+	 *
+	 * @param string $hook_suffix Current admin page hook.
+	 */
+	public function enqueue_assets( string $hook_suffix ): void {
+		if ( 'toplevel_page_wtcb-dashboard' !== $hook_suffix ) {
+			return;
+		}
+
+		$workflow = $this->workflow->get();
+
+		wp_enqueue_style(
+			'wtcb-admin-builder',
+			WTCB_PLUGIN_URL . 'assets/css/admin-builder.css',
+			array(),
+			WTCB_VERSION
+		);
+
+		wp_enqueue_script(
+			'wtcb-admin-builder',
+			WTCB_PLUGIN_URL . 'assets/js/admin-builder.js',
+			array(),
+			WTCB_VERSION,
+			true
+		);
+
+		wp_add_inline_script(
+			'wtcb-admin-builder',
+			'window.wtcbInitialWorkflow = ' . $this->encode_json( $workflow ) . ';',
+			'before'
+		);
 	}
 
 	/**
@@ -70,11 +106,7 @@ final class Builder {
 
 		check_admin_referer( 'wtcb_save_builder' );
 
-		$raw      = isset( $_POST['wtcb_workflow'] ) ? wp_unslash( $_POST['wtcb_workflow'] ) : '';
-		$decoded  = json_decode( (string) $raw, true );
-		$workflow = is_array( $decoded ) ? $decoded : $this->workflow->defaults();
-
-		$this->workflow->save( $workflow );
+		$this->save_submitted_workflow();
 
 		wp_safe_redirect(
 			add_query_arg(
@@ -89,6 +121,41 @@ final class Builder {
 	}
 
 	/**
+	 * Save submitted workflow without reloading the dashboard.
+	 */
+	public function ajax_save(): void {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Sorry, you are not allowed to manage checkout settings.', 'wootale-checkout-builder' ),
+				),
+				403
+			);
+		}
+
+		check_ajax_referer( 'wtcb_save_builder' );
+
+		$this->save_submitted_workflow();
+
+		wp_send_json_success(
+			array(
+				'message' => __( 'WooTale checkout builder saved.', 'wootale-checkout-builder' ),
+			)
+		);
+	}
+
+	/**
+	 * Persist the posted workflow payload.
+	 */
+	private function save_submitted_workflow(): void {
+		$raw      = isset( $_POST['wtcb_workflow'] ) ? wp_unslash( $_POST['wtcb_workflow'] ) : '';
+		$decoded  = json_decode( (string) $raw, true );
+		$workflow = is_array( $decoded ) ? $decoded : $this->workflow->defaults();
+
+		$this->workflow->save( $workflow );
+	}
+
+	/**
 	 * Render builder dashboard.
 	 */
 	public function render(): void {
@@ -100,17 +167,18 @@ final class Builder {
 		$checkout_url = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/' );
 
 		echo '<div class="wrap wtcb-admin">';
-		$this->render_styles();
 		$this->render_header( $checkout_url );
 
-		if ( isset( $_GET['updated'] ) ) {
+		$updated = isset( $_GET['updated'] ) ? sanitize_text_field( wp_unslash( $_GET['updated'] ) ) : '';
+
+		if ( '1' === $updated ) {
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'WooTale checkout builder saved.', 'wootale-checkout-builder' ) . '</p></div>';
 		}
 
 		echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" id="wtcb-builder-form">';
 		wp_nonce_field( 'wtcb_save_builder' );
 		echo '<input type="hidden" name="action" value="wtcb_save_builder" />';
-		echo '<textarea id="wtcb-workflow-input" name="wtcb_workflow" hidden>' . esc_textarea( wp_json_encode( $workflow ) ) . '</textarea>';
+		echo '<textarea id="wtcb-workflow-input" name="wtcb_workflow" hidden>' . esc_textarea( $this->encode_json( $workflow ) ) . '</textarea>';
 		$this->render_global_settings_panel( $workflow );
 		echo '<div id="wtcb-builder-view">';
 		echo '<div class="wtcb-builder-shell">';
@@ -122,7 +190,6 @@ final class Builder {
 		echo '</div>';
 		$this->render_field_settings_modal();
 		echo '</form>';
-		$this->render_scripts( $workflow );
 		echo '</div>';
 	}
 
@@ -140,22 +207,48 @@ final class Builder {
 	private function render_global_settings_panel( array $workflow ): void {
 		$orientation = isset( $workflow['orientation'] ) ? (string) $workflow['orientation'] : 'horizontal';
 		$indicator = isset( $workflow['indicator'] ) ? (string) $workflow['indicator'] : 'number';
+		$step_icon = isset( $workflow['stepIcon'] ) ? (string) $workflow['stepIcon'] : '1';
 		$connector = isset( $workflow['connector'] ) ? (string) $workflow['connector'] : 'solid';
-		$navigation = isset( $workflow['navigation'] ) ? (string) $workflow['navigation'] : 'tabs';
+		$navigation = isset( $workflow['navigation'] ) ? (string) $workflow['navigation'] : 'line';
+		$navigation = 'tabs' === $navigation ? 'line' : $navigation;
 		$active_color = isset( $workflow['activeColor'] ) ? (string) $workflow['activeColor'] : '#2563eb';
 		$completed_color = isset( $workflow['completedColor'] ) ? (string) $workflow['completedColor'] : '#16a34a';
+		$inactive_color = isset( $workflow['inactiveColor'] ) ? (string) $workflow['inactiveColor'] : '#6b7280';
 		$multi_step_enabled = ! array_key_exists( 'multiStepEnabled', $workflow ) || ! empty( $workflow['multiStepEnabled'] );
+		$connector_thickness = isset( $workflow['connectorThickness'] ) ? (int) $workflow['connectorThickness'] : 2;
+		$connector_gap = isset( $workflow['connectorGap'] ) ? (int) $workflow['connectorGap'] : 24;
+		$previous_text = isset( $workflow['previousText'] ) ? (string) $workflow['previousText'] : 'Previous';
+		$next_text = isset( $workflow['nextText'] ) ? (string) $workflow['nextText'] : 'Next';
+		$continue_text = isset( $workflow['continueText'] ) ? (string) $workflow['continueText'] : 'Continue';
+		$previous_button_color = isset( $workflow['previousButtonColor'] ) ? (string) $workflow['previousButtonColor'] : '#1f2937';
+		$previous_button_background = isset( $workflow['previousButtonBackground'] ) ? (string) $workflow['previousButtonBackground'] : '#f5f6f7';
+		$next_button_color = isset( $workflow['nextButtonColor'] ) ? (string) $workflow['nextButtonColor'] : '#ffffff';
+		$next_button_background = isset( $workflow['nextButtonBackground'] ) ? (string) $workflow['nextButtonBackground'] : '#2563eb';
+		$continue_button_color = isset( $workflow['continueButtonColor'] ) ? (string) $workflow['continueButtonColor'] : '#ffffff';
+		$continue_button_background = isset( $workflow['continueButtonBackground'] ) ? (string) $workflow['continueButtonBackground'] : '#16a34a';
+		$allow_completed = ! array_key_exists( 'allowCompletedStepNavigation', $workflow ) || ! empty( $workflow['allowCompletedStepNavigation'] );
+		$scroll_on_change = ! array_key_exists( 'scrollOnStepChange', $workflow ) || ! empty( $workflow['scrollOnStepChange'] );
+		$validate_before_next = ! array_key_exists( 'validateBeforeNext', $workflow ) || ! empty( $workflow['validateBeforeNext'] );
+		$remember_step = ! empty( $workflow['rememberStep'] );
 
 		echo '<section class="wtcb-card wtcb-global-settings" id="wtcb-global-settings" hidden>';
-		echo '<div class="wtcb-global-settings__head"><div><h2>' . esc_html__( 'Checkout Settings', 'wootale-checkout-builder' ) . '</h2><p>' . esc_html__( 'Control the checkout workflow and step navigation.', 'wootale-checkout-builder' ) . '</p></div><div class="wtcb-global-settings__actions"><button type="button" class="button">Import</button><button type="button" class="button">Export</button></div><label class="wtcb-switch-row"><span><strong>' . esc_html__( 'Enable Multi Step', 'wootale-checkout-builder' ) . '</strong><small>' . esc_html__( 'Show customers a guided step flow instead of one continuous checkout.', 'wootale-checkout-builder' ) . '</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-multistep-enabled" ' . checked( $multi_step_enabled, true, false ) . ' /><span></span></label></label></div>';
-		echo '<div class="wtcb-multistep-controls" id="wtcb-multistep-controls" ' . ( $multi_step_enabled ? '' : 'hidden' ) . '>';
-		echo '<div><h3>Steps Number</h3><div class="wtcb-step-count"><button type="button" data-step-count-decrease>-</button><input type="number" id="wtcb-step-count" min="1" max="3" value="' . esc_attr( (string) count( $workflow['steps'] ) ) . '" /><button type="button" data-step-count-increase>+</button></div><p class="wtcb-small-note">Free workflows support up to 3 steps.</p></div>';
-		echo '<div><h3>Step Layout</h3><div class="wtcb-segment" data-setting-segment="orientation"><button type="button" data-value="horizontal" class="' . esc_attr( 'horizontal' === $orientation ? 'is-active' : '' ) . '">Horizontal</button><button type="button" data-value="vertical" class="' . esc_attr( 'vertical' === $orientation ? 'is-active' : '' ) . '">Vertical</button></div></div>';
-		echo '<div><h3>Indicator</h3><div class="wtcb-segment" data-setting-segment="indicator"><button type="button" data-value="number" class="' . esc_attr( 'number' === $indicator ? 'is-active' : '' ) . '">Number</button><button type="button" data-value="icon" class="' . esc_attr( 'icon' === $indicator ? 'is-active' : '' ) . '">Icon</button><button type="button" data-value="tab" class="' . esc_attr( 'tab' === $indicator ? 'is-active' : '' ) . '">Tab</button></div></div>';
-		echo '<div><h3>Connector</h3><select id="wtcb-connector"><option value="solid" ' . selected( $connector, 'solid', false ) . '>Solid line</option><option value="line" ' . selected( $connector, 'line', false ) . '>Thin line</option><option value="arrow" ' . selected( $connector, 'arrow', false ) . '>Arrow</option><option value="none" ' . selected( $connector, 'none', false ) . '>None</option></select></div>';
-		echo '<div><h3>Navigation</h3><div class="wtcb-segment" data-setting-segment="navigation"><button type="button" data-value="tabs" class="' . esc_attr( 'tabs' === $navigation ? 'is-active' : '' ) . '">Tabs</button><button type="button" data-value="buttons" class="' . esc_attr( 'buttons' === $navigation ? 'is-active' : '' ) . '">Buttons</button></div></div>';
-		echo '<div><h3>Colors</h3><label>Active Color <input type="color" id="wtcb-active-color" value="' . esc_attr( $active_color ) . '" /></label><label>Completed Color <input type="color" id="wtcb-completed-color" value="' . esc_attr( $completed_color ) . '" /></label></div>';
+		echo '<div class="wtcb-settings-title"><div><h2>' . esc_html__( 'General Settings', 'wootale-checkout-builder' ) . '</h2><p>' . esc_html__( 'Control the main checkout behavior and workflow.', 'wootale-checkout-builder' ) . '</p></div><div class="wtcb-global-settings__actions"><button type="button" class="button">Import</button><button type="button" class="button">Export</button></div></div>';
+		echo '<div class="wtcb-settings-list">';
+		echo '<label class="wtcb-check-row"><input type="checkbox" id="wtcb-multistep-enabled" ' . checked( $multi_step_enabled, true, false ) . ' /><span><strong>' . esc_html__( 'Enable Multistep form', 'wootale-checkout-builder' ) . '</strong><small>' . esc_html__( 'Show customers a guided step-by-step checkout.', 'wootale-checkout-builder' ) . '</small></span></label>';
+		echo '<button type="button" class="button wtcb-configure-multistep" id="wtcb-open-multistep-settings" ' . ( $multi_step_enabled ? '' : 'hidden' ) . '>' . esc_html__( 'Configure multistep settings', 'wootale-checkout-builder' ) . '</button>';
 		echo '</div></section>';
+		echo '<div class="wtcb-modal" id="wtcb-multistep-modal" hidden role="dialog" aria-modal="true" aria-labelledby="wtcb-multistep-modal-title"><div class="wtcb-modal__panel wtcb-modal__panel--settings">';
+		echo '<div class="wtcb-modal__head"><h2 id="wtcb-multistep-modal-title">' . esc_html__( 'Multistep Settings', 'wootale-checkout-builder' ) . '</h2><button type="button" class="wtcb-icon-button" data-close-multistep-settings>×</button></div>';
+		echo '<div class="wtcb-modal__body wtcb-multistep-controls" id="wtcb-multistep-controls">';
+		echo '<section class="wtcb-control-card wtcb-control-steps"><h3>Steps Number</h3><div class="wtcb-step-count"><button type="button" data-step-count-decrease>-</button><input type="number" id="wtcb-step-count" min="1" max="3" value="' . esc_attr( (string) count( $workflow['steps'] ) ) . '" /><button type="button" data-step-count-increase>+</button></div><p class="wtcb-small-note">Free version allows up to 3 steps.</p></section>';
+		echo '<section class="wtcb-control-card wtcb-control-layout"><h3>Step Layout</h3><div class="wtcb-choice-cards" data-setting-segment="orientation"><button type="button" data-value="horizontal" class="' . esc_attr( 'horizontal' === $orientation ? 'is-active' : '' ) . '"><span class="wtcb-mini-icon">o-o-o</span><strong>Horizontal</strong></button><button type="button" data-value="vertical" class="' . esc_attr( 'vertical' === $orientation ? 'is-active' : '' ) . '"><span class="wtcb-mini-icon">o<br>|<br>o</span><strong>Vertical</strong></button></div></section>';
+		echo '<section class="wtcb-control-card wtcb-control-navigation"><h3>Navigation Style</h3><div class="wtcb-choice-cards" data-setting-segment="navigation"><button type="button" data-value="line" class="' . esc_attr( 'line' === $navigation ? 'is-active' : '' ) . '"><strong>Line</strong></button><button type="button" data-value="buttons" class="' . esc_attr( 'buttons' === $navigation ? 'is-active' : '' ) . '"><strong>Button</strong></button></div></section>';
+		echo '<section class="wtcb-control-card wtcb-line-setting wtcb-control-indicator"><h3>Step Indicator</h3><label>Type<select id="wtcb-indicator-select"><option value="number" ' . selected( $indicator, 'number', false ) . '>Number</option><option value="icon" ' . selected( $indicator, 'icon', false ) . '>Icon</option></select></label><p>Icon</p><div class="wtcb-icon-picker" data-setting-segment="stepIcon"><button type="button" data-value="1" class="' . esc_attr( '1' === $step_icon ? 'is-active' : '' ) . '">1</button><button type="button" data-value="user" class="' . esc_attr( 'user' === $step_icon ? 'is-active' : '' ) . '">♙</button><button type="button" data-value="flag" class="' . esc_attr( 'flag' === $step_icon ? 'is-active' : '' ) . '">⚑</button><button type="button" data-value="star" class="' . esc_attr( 'star' === $step_icon ? 'is-active' : '' ) . '">☆</button><button type="button" data-value="check" class="' . esc_attr( 'check' === $step_icon ? 'is-active' : '' ) . '">✓</button></div></section>';
+		echo '<section class="wtcb-control-card wtcb-line-setting wtcb-control-connector"><h3>Connector</h3><label>Style<select id="wtcb-connector"><option value="solid" ' . selected( $connector, 'solid', false ) . '>Solid Line</option><option value="line" ' . selected( $connector, 'line', false ) . '>Thin Line</option><option value="arrow" ' . selected( $connector, 'arrow', false ) . '>Arrow</option><option value="none" ' . selected( $connector, 'none', false ) . '>None</option></select></label><label>Thickness <span><input type="range" id="wtcb-connector-thickness" min="1" max="8" value="' . esc_attr( (string) $connector_thickness ) . '" /> <output id="wtcb-connector-thickness-output">' . esc_html( (string) $connector_thickness ) . 'px</output></span></label><label>Gap <span><input type="range" id="wtcb-connector-gap" min="8" max="64" value="' . esc_attr( (string) $connector_gap ) . '" /> <output id="wtcb-connector-gap-output">' . esc_html( (string) $connector_gap ) . 'px</output></span></label></section>';
+		echo '<section class="wtcb-control-card wtcb-control-colors"><h3>Colors</h3><label>Active Color <input type="color" id="wtcb-active-color" value="' . esc_attr( $active_color ) . '" /></label><label>Completed Color <input type="color" id="wtcb-completed-color" value="' . esc_attr( $completed_color ) . '" /></label><label>Inactive Color <input type="color" id="wtcb-inactive-color" value="' . esc_attr( $inactive_color ) . '" /></label></section>';
+		echo '<section class="wtcb-control-card wtcb-control-buttons"><h3>Navigation Buttons</h3><div class="wtcb-button-config-grid"><div><h4>Previous Button</h4><label>Text <input type="text" id="wtcb-previous-text" value="' . esc_attr( $previous_text ) . '" /></label><label>Color <input type="color" id="wtcb-previous-button-color" value="' . esc_attr( $previous_button_color ) . '" /></label><label>Background <input type="color" id="wtcb-previous-button-bg" value="' . esc_attr( $previous_button_background ) . '" /></label></div><div><h4>Next Button</h4><label>Text <input type="text" id="wtcb-next-text" value="' . esc_attr( $next_text ) . '" /></label><label>Color <input type="color" id="wtcb-next-button-color" value="' . esc_attr( $next_button_color ) . '" /></label><label>Background <input type="color" id="wtcb-next-button-bg" value="' . esc_attr( $next_button_background ) . '" /></label></div><div><h4>Continue Button</h4><label>Text <input type="text" id="wtcb-continue-text" value="' . esc_attr( $continue_text ) . '" /></label><label>Color <input type="color" id="wtcb-continue-button-color" value="' . esc_attr( $continue_button_color ) . '" /></label><label>Background <input type="color" id="wtcb-continue-button-bg" value="' . esc_attr( $continue_button_background ) . '" /></label></div></div></section>';
+		echo '<section><h3>Step Behavior</h3><label class="wtcb-switch-row"><span><strong>Allow clicking completed steps</strong><small>Users can go back to previous completed steps.</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-allow-completed" ' . checked( $allow_completed, true, false ) . ' /><span></span></label></label><label class="wtcb-switch-row"><span><strong>Scroll to top on step change</strong><small>Automatically scroll to the checkout stepper.</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-scroll-on-change" ' . checked( $scroll_on_change, true, false ) . ' /><span></span></label></label><label class="wtcb-switch-row"><span><strong>Validate before next step</strong><small>Prevent moving forward if current fields are invalid.</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-validate-before-next" ' . checked( $validate_before_next, true, false ) . ' /><span></span></label></label><label class="wtcb-switch-row"><span><strong>Remember step on refresh</strong><small>Restore the last active step.</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-remember-step" ' . checked( $remember_step, true, false ) . ' /><span></span></label></label></section>';
+		echo '</div><div class="wtcb-modal__foot"><button type="button" class="button" data-close-multistep-settings>' . esc_html__( 'Close', 'wootale-checkout-builder' ) . '</button></div></div></div>';
 	}
 
 	private function render_component_panel(): void {
@@ -270,7 +363,7 @@ final class Builder {
 		printf(
 			'<div class="%1$s" draggable="true" data-field="%2$s"><span class="wtcb-field-handle" title="%3$s">▦</span><button type="button" class="wtcb-field-settings-button" data-open-field-settings title="%5$s">⚙</button><strong>%4$s</strong><span class="wtcb-field-actions"><button type="button" class="wtcb-icon-button" data-duplicate-field %6$s title="%7$s">⧉</button><button type="button" class="wtcb-icon-button wtcb-danger" data-remove-field %8$s title="%9$s">×</button></span></div>',
 			esc_attr( $classes ),
-			esc_attr( wp_json_encode( $field ) ),
+			esc_attr( $this->encode_json( $field ) ),
 			esc_attr__( 'Drag field', 'wootale-checkout-builder' ),
 			esc_html( $field['label'] ),
 			esc_attr__( 'Field settings', 'wootale-checkout-builder' ),
@@ -336,413 +429,14 @@ final class Builder {
 		echo '<div class="wtcb-card wtcb-stats"><div><strong>Checkout Flow</strong><span>Cart → Checkout → Thank You</span></div><div><strong>Steps Limit</strong><span>' . esc_html( count( $workflow['steps'] ) ) . ' / 3 used</span></div><div><strong>Fields Count</strong><span>' . esc_html( (string) $count ) . ' fields added</span></div><div><strong>Last Saved</strong><span>Just now</span></div></div>';
 	}
 
-	private function render_styles(): void {
-		echo '<style>
-		.wtcb-admin{--blue:#2563eb;--line:#dbeafe;--ink:#111827;--muted:#6b7280;max-width:1660px}
-		.wtcb-topbar{background:#fff;border:1px solid #e5e7eb;border-radius:10px;display:grid;gap:14px;margin:16px 0;padding:16px}
-		.wtcb-topbar-main{align-items:center;display:flex;gap:18px;justify-content:space-between}
-		.wtcb-brand{align-items:center;display:flex;gap:12px}.wtcb-brand h1{font-size:22px;margin:0}.wtcb-brand span{font-weight:400}.wtcb-logo{align-items:center;border:2px solid var(--blue);border-radius:8px;color:var(--blue);display:inline-flex;font-size:11px;font-weight:700;height:30px;justify-content:center;width:30px}
-		.wtcb-tabs{border-top:1px solid #e5e7eb;display:flex;flex-wrap:wrap;gap:24px;padding-top:12px}.wtcb-tabs a{color:#4b5563;cursor:pointer;text-decoration:none}.wtcb-tabs .is-active{border-bottom:2px solid var(--blue);color:var(--blue);padding-bottom:10px}.wtcb-tabs span,.wtcb-components h3 span{background:#ede9fe;border-radius:6px;color:#7c3aed;font-size:11px;padding:2px 6px}.wtcb-actions{display:flex;gap:8px}
-		.wtcb-global-settings{margin:0 0 20px}.wtcb-global-settings__head{align-items:center;display:grid;gap:20px;grid-template-columns:1fr auto auto}.wtcb-global-settings__actions{display:flex;gap:8px}.wtcb-global-settings__head h2{margin-bottom:4px}.wtcb-global-settings__head p{color:#6b7280;margin:0}.wtcb-multistep-controls{border-top:1px solid #e5e7eb;display:grid;gap:18px;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px;padding-top:16px}.wtcb-multistep-controls[hidden]{display:none}.wtcb-switch-row{align-items:center;background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;display:flex;gap:20px;justify-content:space-between;min-width:340px;padding:12px}.wtcb-switch-row>span{display:grid;gap:4px}.wtcb-switch-row small{color:#6b7280;font-weight:400}
-		.wtcb-builder-shell{display:grid;gap:20px;grid-template-columns:320px minmax(520px,1fr) 320px}.wtcb-card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:16px}.wtcb-card h2{font-size:16px;margin:0 0 14px}.wtcb-card h3{font-size:13px;margin:18px 0 10px}.wtcb-search,.wtcb-settings select,.wtcb-step input,.wtcb-global-settings select{border:1px solid #e5e7eb;border-radius:6px;box-sizing:border-box;width:100%}
-		.wtcb-component-grid{display:grid;gap:8px;grid-template-columns:1fr 1fr}.wtcb-component-grid button,.wtcb-component{background:#fff;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;padding:10px;text-align:left}.wtcb-component-grid.is-disabled button{color:#9ca3af}.wtcb-hint{background:#f9fafb;color:#6b7280;margin:16px -16px -16px;padding:12px 16px}
-		.wtcb-canvas-head{align-items:center;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;margin:-16px -16px 16px;padding:16px}.wtcb-canvas-head span{background:#dbeafe;border-radius:6px;color:#2563eb;font-size:12px;padding:2px 8px}
-		.wtcb-step{background:linear-gradient(90deg,rgba(37,99,235,.05),#fff);border:2px solid var(--step-color);border-radius:10px;margin-bottom:14px;padding:14px}.wtcb-step-head{align-items:center;display:grid;gap:12px;grid-template-columns:18px 30px 1fr 32px}.wtcb-drag{color:#9ca3af;cursor:grab}.wtcb-badge{align-items:center;background:var(--step-color);border-radius:50%;color:#fff;display:flex;height:30px;justify-content:center;width:30px}.wtcb-step-title{border:0!important;font-weight:700;padding:2px!important}.wtcb-step-description{border:0!important;color:#6b7280;padding:2px!important}
-		.wtcb-field-list{align-items:start;display:grid;gap:10px;grid-auto-flow:row dense;grid-template-columns:repeat(2,minmax(0,1fr));min-height:54px;padding-top:12px}.wtcb-field-card{align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:6px;display:grid;gap:8px;grid-template-columns:18px 28px minmax(0,1fr) auto;min-height:42px;padding:10px}.wtcb-field-card.is-disabled{opacity:.5}.wtcb-field-card.is-dragging{opacity:.35}.wtcb-field-card strong{overflow-wrap:anywhere}.wtcb-field-handle{color:#9ca3af;cursor:grab}.wtcb-field-settings-button{background:transparent;border:0;color:#4b5563;cursor:pointer;font-size:20px;height:28px;line-height:1;padding:0;width:28px}.wtcb-field-settings-button:hover{color:#2563eb}.wtcb-field-actions{display:flex;gap:4px}.wtcb-icon-button{align-items:center;background:transparent;border:0;border-radius:5px;color:#4b5563;cursor:pointer;display:inline-flex;font-size:17px;height:28px;justify-content:center;line-height:1;padding:0;width:28px}.wtcb-icon-button:hover{background:#f3f4f6}.wtcb-icon-button:disabled{background:transparent;cursor:not-allowed;opacity:.3}.wtcb-icon-button.wtcb-danger{color:#dc2626}.wtcb-width-1{grid-column:span 1}.wtcb-width-2{grid-column:1/-1}
-		.wtcb-add-step{background:#fff;border:1px dashed #cbd5e1;border-radius:10px;color:#2563eb;cursor:pointer;padding:24px;width:100%}.wtcb-add-step small{color:#6b7280}
-		.wtcb-setting-tabs{border-bottom:1px solid #e5e7eb;display:flex;gap:22px;margin:16px -16px;padding:0 16px 10px}.wtcb-setting-tabs .is-active{border-bottom:2px solid var(--blue);color:var(--blue)}.wtcb-segment{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(80px,1fr))}.wtcb-segment button,.wtcb-icons button,.wtcb-step-count button{background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:10px}.wtcb-segment .is-active,.wtcb-icons .is-active{border-color:#2563eb;color:#2563eb}.wtcb-icons{display:flex;gap:8px}.wtcb-settings label,.wtcb-global-settings label{display:flex;justify-content:space-between;margin:12px 0}.wtcb-settings select,.wtcb-global-settings select{min-height:38px}.wtcb-step-count{display:grid;gap:8px;grid-template-columns:42px 1fr 42px}.wtcb-step-count input{border:1px solid #e5e7eb;border-radius:6px;text-align:center}.wtcb-small-note{color:#6b7280;font-size:12px;margin:8px 0 0}.wtcb-delete-step{border-color:#fecaca!important;color:#dc2626!important;margin-top:16px;width:100%}
-		.wtcb-stats{display:grid;gap:16px;grid-template-columns:repeat(4,1fr);margin-top:20px}.wtcb-stats div{border-right:1px solid #e5e7eb;padding:8px 16px}.wtcb-stats div:last-child{border-right:0}.wtcb-stats strong,.wtcb-stats span{display:block}.wtcb-stats span{color:#4b5563;margin-top:8px}
-		.wtcb-modal{align-items:center;background:rgba(15,23,42,.45);bottom:0;display:flex;justify-content:center;left:0;position:fixed;right:0;top:0;z-index:100000}.wtcb-modal[hidden]{display:none}.wtcb-modal__panel{background:#fff;border-radius:10px;box-shadow:0 24px 80px rgba(15,23,42,.25);max-height:calc(100vh - 48px);max-width:900px;overflow:auto;width:min(900px,calc(100vw - 32px))}.wtcb-modal__head,.wtcb-modal__foot{align-items:center;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;padding:16px;position:sticky;top:0;z-index:1}.wtcb-modal__foot{border-bottom:0;border-top:1px solid #e5e7eb;bottom:0;gap:8px;justify-content:flex-end;top:auto}.wtcb-modal__head h2{font-size:18px;margin:0}.wtcb-modal__body{display:grid;gap:16px;padding:16px}.wtcb-modal-grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}.wtcb-modal__body label{display:grid;gap:6px;font-weight:600}.wtcb-modal__body input[type=text],.wtcb-modal__body select,.wtcb-modal__body textarea{border:1px solid #d1d5db;border-radius:6px;box-sizing:border-box;min-height:40px;padding:8px;width:100%}.wtcb-modal__body textarea{resize:vertical}.wtcb-modal__body select[multiple]{min-height:86px}.wtcb-toggle-row{align-items:center;background:#f9fafb;border:1px solid #f3f4f6;border-radius:8px;display:flex;justify-content:space-between;padding:14px}.wtcb-toggle-row span{display:grid;gap:4px}.wtcb-toggle-row small{color:#6b7280;font-weight:400}.wtcb-switch input{clip:rect(0,0,0,0);height:1px;position:absolute;width:1px}.wtcb-switch span{background:#cbd5e1;border-radius:999px;display:block;height:24px;position:relative;width:44px}.wtcb-switch span:before{background:#fff;border-radius:50%;content:"";height:18px;left:3px;position:absolute;top:3px;transition:.15s;width:18px}.wtcb-switch input:checked+span{background:#2563eb}.wtcb-switch input:checked+span:before{left:23px}.wtcb-native-lock-note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;color:#1d4ed8;margin:0;padding:10px}
-		@media(max-width:1200px){.wtcb-builder-shell{grid-template-columns:1fr}.wtcb-topbar-main{align-items:flex-start;display:grid}.wtcb-stats,.wtcb-multistep-controls{grid-template-columns:1fr 1fr}.wtcb-global-settings__head{grid-template-columns:1fr}}@media(max-width:700px){.wtcb-field-list,.wtcb-modal-grid,.wtcb-multistep-controls{grid-template-columns:1fr}.wtcb-width-1,.wtcb-width-2{grid-column:1/-1}.wtcb-global-settings__head{align-items:stretch;display:grid}.wtcb-switch-row{min-width:0}}
-		</style>';
-	}
-
 	/**
-	 * @param array<string,mixed> $workflow Workflow.
+	 * Encode data for safe reuse in HTML attributes, textareas, and inline scripts.
+	 *
+	 * @param array<string,mixed> $data Data to encode.
 	 */
-	private function render_scripts( array $workflow ): void {
-		echo '<script>window.wtcbInitialWorkflow = ' . wp_json_encode( $workflow ) . ';</script>';
-		echo <<<'JS'
-<script>
-(function(){
-	var dragged = null;
-	var paletteField = null;
-	var activeCard = null;
-	var steps = document.getElementById('wtcb-steps');
-	var input = document.getElementById('wtcb-workflow-input');
-	var builderView = document.getElementById('wtcb-builder-view');
-	var globalSettings = document.getElementById('wtcb-global-settings');
-	var multiStepEnabled = document.getElementById('wtcb-multistep-enabled');
-	var multiStepControls = document.getElementById('wtcb-multistep-controls');
-	var canvasCount = document.querySelector('.wtcb-canvas-head h2 span');
-	var stepCount = document.getElementById('wtcb-step-count');
-	var connector = document.getElementById('wtcb-connector');
-	var activeColor = document.getElementById('wtcb-active-color');
-	var completedColor = document.getElementById('wtcb-completed-color');
-	var modal = document.getElementById('wtcb-field-modal');
-	var modalTitle = document.getElementById('wtcb-field-modal-title');
-	var modalFieldType = document.getElementById('wtcb-modal-field-type');
-	var modalSection = document.getElementById('wtcb-modal-section');
-	var modalLabel = document.getElementById('wtcb-modal-label');
-	var modalKey = document.getElementById('wtcb-modal-key');
-	var modalDefault = document.getElementById('wtcb-modal-default');
-	var modalPlaceholder = document.getElementById('wtcb-modal-placeholder');
-	var modalOptions = document.getElementById('wtcb-modal-options');
-	var modalValidation = document.getElementById('wtcb-modal-validation');
-	var modalWidth = document.getElementById('wtcb-modal-width');
-	var modalRequired = document.getElementById('wtcb-modal-required');
-	var modalEnabled = document.getElementById('wtcb-modal-enabled');
-	var modalDisplayOrder = document.getElementById('wtcb-modal-display-order');
-	var modalDisplayEmails = document.getElementById('wtcb-modal-display-emails');
-	var modalDisplayThankYou = document.getElementById('wtcb-modal-display-thank-you');
-	var modalLockNote = document.getElementById('wtcb-native-lock-note');
+	private function encode_json( array $data ): string {
+		$encoded = wp_json_encode( $data );
 
-	function parseField(card){ try { return JSON.parse(card.dataset.field || '{}'); } catch(e){ return {}; } }
-	function fieldWidth(field){ return [1,2].indexOf(Number(field.width)) >= 0 ? Number(field.width) : 2; }
-	function displayOptions(field){
-		var display = field.display || {};
-		return {
-			orderDetails: display.orderDetails !== false,
-			emails: display.emails !== false,
-			thankYou: display.thankYou !== false
-		};
-	}
-	function setField(card, field){
-		var width = fieldWidth(field);
-		field.display = displayOptions(field);
-		card.dataset.field = JSON.stringify(field);
-		card.classList.toggle('is-disabled', field.enabled === false);
-		card.classList.remove('wtcb-width-1', 'wtcb-width-2', 'wtcb-width-3');
-		card.classList.add('wtcb-width-' + width);
-		card.querySelector('strong').textContent = field.label || field.key || 'Field';
-	}
-	function fieldCard(field){
-		var card = document.createElement('div');
-		field.width = fieldWidth(field);
-		card.className = 'wtcb-field-card wtcb-width-' + field.width;
-		card.draggable = true;
-		card.innerHTML = '<span class="wtcb-field-handle" title="Drag field">▦</span><button type="button" class="wtcb-field-settings-button" data-open-field-settings title="Field settings">⚙</button><strong></strong><span class="wtcb-field-actions"><button type="button" class="wtcb-icon-button" data-duplicate-field title="Duplicate field">⧉</button><button type="button" class="wtcb-icon-button wtcb-danger" data-remove-field title="Remove field">×</button></span>';
-		card.querySelector('[data-duplicate-field]').disabled = field.type !== 'custom';
-		setField(card, field);
-		return card;
-	}
-	function customField(type, label) {
-		var key = 'wtcb_' + type + '_' + Date.now();
-		return { id:key, key:key, section:'order', type:'custom', fieldType:type, label:label, required:false, enabled:true, width:2, default:'', placeholder:'', options:'', validation:[], display:{ orderDetails:true, emails:true, thankYou:true } };
-	}
-	function nativeField(section, key, label, required) {
-		return { id:key, key:key, section:section, type:'native', fieldType:'text', label:label, required:required, enabled:true, width:2, default:'', placeholder:'', options:'', validation:[], display:{ orderDetails:true, emails:true, thankYou:true } };
-	}
-	function componentField(key, label) {
-		return { id:'component_' + key, key:key, section:'component', type:'component', fieldType:'component', label:label, required:false, enabled:true, width:2, default:'', placeholder:'', options:'', validation:[], display:{ orderDetails:true, emails:true, thankYou:true } };
-	}
-	function settingValue(name, fallback) {
-		var active = document.querySelector('[data-setting-segment="' + name + '"] .is-active');
-		return active ? active.dataset.value : fallback;
-	}
-	function refreshMultiStepControls(){
-		if (multiStepControls && multiStepEnabled) {
-			multiStepControls.hidden = !multiStepEnabled.checked;
-		}
-	}
-	function renumberSteps(){
-		steps.querySelectorAll('.wtcb-step').forEach(function(step, index){
-			step.dataset.stepIndex = String(index);
-			var badge = step.querySelector('.wtcb-badge');
-			if (badge) {
-				badge.textContent = String(index + 1);
-			}
-		});
-		if (stepCount) {
-			stepCount.value = String(steps.querySelectorAll('.wtcb-step').length);
-		}
-		if (canvasCount) {
-			canvasCount.textContent = steps.querySelectorAll('.wtcb-step').length + ' / 3 Free';
-		}
-	}
-	function stepCard(index){
-		var colors = ['#2563eb', '#16a34a', '#7c3aed'];
-		var step = document.createElement('section');
-		step.className = 'wtcb-step';
-		step.dataset.stepIndex = String(index);
-		step.style.setProperty('--step-color', colors[index] || '#2563eb');
-		step.innerHTML = '<div class="wtcb-step-head"><span class="wtcb-drag">::</span><span class="wtcb-badge">' + (index + 1) + '</span><div><input class="wtcb-step-title" value="Step ' + (index + 1) + '" /><input class="wtcb-step-description" value="" /></div><button type="button" class="wtcb-collapse">⌃</button></div><div class="wtcb-field-list" data-step-fields></div>';
-		return step;
-	}
-	function setStepCount(nextCount){
-		var current = steps.querySelectorAll('.wtcb-step').length;
-		nextCount = Math.max(1, Math.min(3, Number(nextCount) || current));
-
-		while (current < nextCount) {
-			steps.appendChild(stepCard(current));
-			current++;
-		}
-
-		while (current > nextCount) {
-			steps.lastElementChild.remove();
-			current--;
-		}
-
-		renumberSteps();
-		serialize();
-	}
-	function fieldDropTarget(list, y){
-		var cards = Array.prototype.slice.call(list.querySelectorAll('.wtcb-field-card:not(.is-dragging)'));
-		return cards.reduce(function(closest, child){
-			var box = child.getBoundingClientRect();
-			var offset = y - box.top - box.height / 2;
-			if (offset < 0 && offset > closest.offset) {
-				return { offset: offset, element: child };
-			}
-			return closest;
-		}, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
-	}
-	function serialize(){
-		var workflow = {
-			version: 1,
-			multiStepEnabled: multiStepEnabled ? multiStepEnabled.checked : true,
-			orientation: settingValue('orientation', 'horizontal'),
-			indicator: settingValue('indicator', 'number'),
-			connector: connector ? connector.value : 'solid',
-			navigation: settingValue('navigation', 'tabs'),
-			activeColor: activeColor ? activeColor.value : '#2563eb',
-			completedColor: completedColor ? completedColor.value : '#16a34a',
-			steps: []
-		};
-		steps.querySelectorAll('.wtcb-step').forEach(function(step, index){
-			var fields = [];
-			step.querySelectorAll('.wtcb-field-card').forEach(function(card){ fields.push(parseField(card)); });
-			workflow.steps.push({
-				id: 'wtcb_step_' + (index + 1),
-				title: step.querySelector('.wtcb-step-title').value || ('Step ' + (index + 1)),
-				description: step.querySelector('.wtcb-step-description').value || '',
-				color: getComputedStyle(step).getPropertyValue('--step-color').trim() || '#2563eb',
-				fields: fields
-			});
-		});
-		input.value = JSON.stringify(workflow);
-		renumberSteps();
-	}
-
-	document.addEventListener('dragstart', function(event){
-		var card = event.target.closest('.wtcb-field-card');
-		var component = event.target.closest('[data-add-field]');
-		var wooField = event.target.closest('[data-woo-field]');
-		var wooComponent = event.target.closest('[data-woo-component]');
-
-		if (component) {
-			paletteField = customField(component.dataset.addField, component.textContent.trim());
-			event.dataTransfer.effectAllowed = 'copy';
-			return;
-		}
-
-		if (wooField) {
-			paletteField = nativeField(wooField.dataset.section, wooField.dataset.wooField, wooField.textContent.trim(), wooField.dataset.required === '1');
-			event.dataTransfer.effectAllowed = 'copy';
-			return;
-		}
-
-		if (wooComponent) {
-			paletteField = componentField(wooComponent.dataset.wooComponent, wooComponent.textContent.trim());
-			event.dataTransfer.effectAllowed = 'copy';
-			return;
-		}
-
-		if (card) {
-			dragged = card;
-			card.classList.add('is-dragging');
-			event.dataTransfer.effectAllowed = 'move';
-		}
-	});
-	document.addEventListener('dragend', function(){
-		if (dragged) {
-			dragged.classList.remove('is-dragging');
-		}
-		dragged = null;
-		paletteField = null;
-	});
-	document.addEventListener('dragover', function(event){
-		var list = event.target.closest('[data-step-fields]');
-		if (list) {
-			event.preventDefault();
-			var before = fieldDropTarget(list, event.clientY);
-			if (dragged && before !== dragged) {
-				list.insertBefore(dragged, before);
-			}
-		}
-	});
-	document.addEventListener('drop', function(event){
-		var list = event.target.closest('[data-step-fields]');
-		if (!list) {
-			return;
-		}
-
-		if (paletteField) {
-			event.preventDefault();
-			var before = fieldDropTarget(list, event.clientY);
-			list.insertBefore(fieldCard(paletteField), before);
-			paletteField = null;
-			serialize();
-			return;
-		}
-
-		if (dragged) {
-			event.preventDefault();
-			dragged.classList.remove('is-dragging');
-			dragged = null;
-			serialize();
-		}
-	});
-	document.addEventListener('click', function(event){
-		var card = event.target.closest('.wtcb-field-card');
-		var segmentButton = event.target.closest('[data-setting-segment] button[data-value]');
-		var topTab = event.target.closest('[data-wtcb-tab]');
-
-		if (topTab) {
-			event.preventDefault();
-			Array.prototype.forEach.call(document.querySelectorAll('[data-wtcb-tab]'), function(tab){
-				tab.classList.toggle('is-active', tab === topTab);
-			});
-			if (builderView) {
-				builderView.hidden = topTab.dataset.wtcbTab !== 'builder';
-			}
-			if (globalSettings) {
-				globalSettings.hidden = topTab.dataset.wtcbTab !== 'settings';
-			}
-		}
-		if (segmentButton) {
-			Array.prototype.forEach.call(segmentButton.parentNode.children, function(button){
-				button.classList.toggle('is-active', button === segmentButton);
-			});
-			serialize();
-		}
-		if (event.target.matches('[data-step-count-decrease]')) {
-			setStepCount(steps.querySelectorAll('.wtcb-step').length - 1);
-		}
-		if (event.target.matches('[data-step-count-increase], #wtcb-add-step')) {
-			setStepCount(steps.querySelectorAll('.wtcb-step').length + 1);
-		}
-		if (event.target.matches('.wtcb-delete-step')) {
-			setStepCount(steps.querySelectorAll('.wtcb-step').length - 1);
-		}
-		if (event.target.matches('[data-open-field-settings]') && card) {
-			var field = parseField(card);
-			var display = displayOptions(field);
-			activeCard = card;
-			modalTitle.textContent = 'Edit: ' + (field.label || field.key || 'Field');
-			modalFieldType.value = field.fieldType || 'text';
-			modalFieldType.disabled = field.type !== 'custom';
-			modalSection.value = field.section || 'order';
-			modalSection.disabled = field.type !== 'custom';
-			modalLabel.value = field.label || '';
-			modalKey.value = field.key || '';
-			modalKey.disabled = field.type !== 'custom';
-			modalDefault.value = field.default || '';
-			modalPlaceholder.value = field.placeholder || '';
-			modalOptions.value = field.options || '';
-			Array.prototype.forEach.call(modalValidation.options, function(option){
-				option.selected = (field.validation || []).indexOf(option.value) >= 0;
-			});
-			modalWidth.value = String(fieldWidth(field));
-			modalRequired.checked = !!field.required;
-			modalEnabled.checked = field.enabled !== false;
-			modalDisplayOrder.checked = display.orderDetails;
-			modalDisplayEmails.checked = display.emails;
-			modalDisplayThankYou.checked = display.thankYou;
-			modalLockNote.hidden = field.type === 'custom';
-			modal.hidden = false;
-		}
-		if (event.target.matches('[data-close-field-settings]')) {
-			modal.hidden = true;
-			activeCard = null;
-		}
-		if (event.target.matches('#wtcb-apply-field-settings') && activeCard) {
-			var next = parseField(activeCard);
-			next.label = modalLabel.value.trim() || next.label || next.key;
-			if (next.type === 'custom') {
-				next.fieldType = modalFieldType.value || 'text';
-				next.section = modalSection.value || 'order';
-				next.key = modalKey.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '') || next.key;
-			}
-			next.default = modalDefault.value.trim();
-			next.placeholder = modalPlaceholder.value.trim();
-			next.options = modalOptions.value.trim();
-			next.validation = Array.prototype.filter.call(modalValidation.options, function(option){ return option.selected; }).map(function(option){ return option.value; });
-			next.required = modalRequired.checked;
-			next.enabled = modalEnabled.checked;
-			next.width = Number(modalWidth.value) || 2;
-			next.display = {
-				orderDetails: modalDisplayOrder.checked,
-				emails: modalDisplayEmails.checked,
-				thankYou: modalDisplayThankYou.checked
-			};
-			setField(activeCard, next);
-			serialize();
-			modal.hidden = true;
-			activeCard = null;
-		}
-		if (event.target.matches('[data-duplicate-field]') && card && !event.target.disabled) {
-			var field = parseField(card);
-			if (field.type === 'custom') {
-				var copy = JSON.parse(JSON.stringify(field));
-				copy.key = 'wtcb_' + copy.fieldType + '_' + Date.now();
-				copy.id = copy.key;
-				copy.label = (copy.label || 'Field') + ' copy';
-				card.parentNode.insertBefore(fieldCard(copy), card.nextSibling);
-				serialize();
-			}
-		}
-		if (event.target.matches('[data-remove-field]') && card && !event.target.disabled) {
-			card.remove();
-			serialize();
-		}
-		if (event.target.matches('[data-add-field]')) {
-			var type = event.target.dataset.addField;
-			var list = steps.querySelector('[data-step-fields]');
-			list.appendChild(fieldCard(customField(type, event.target.textContent.trim())));
-			serialize();
-		}
-		if (event.target.matches('[data-woo-field]')) {
-			var wooList = steps.querySelector('[data-step-fields]');
-			wooList.appendChild(fieldCard(nativeField(event.target.dataset.section, event.target.dataset.wooField, event.target.textContent.trim(), event.target.dataset.required === '1')));
-			serialize();
-		}
-		if (event.target.matches('[data-woo-component]')) {
-			var componentKey = event.target.dataset.wooComponent;
-			var componentList = steps.querySelector('[data-step-fields]');
-			componentList.appendChild(fieldCard(componentField(componentKey, event.target.textContent.trim())));
-			serialize();
-		}
-	});
-	if (stepCount) {
-		stepCount.addEventListener('change', function(){ setStepCount(stepCount.value); });
-	}
-	if (multiStepEnabled) {
-		multiStepEnabled.addEventListener('change', function(){
-			refreshMultiStepControls();
-			serialize();
-		});
-	}
-	if (connector) {
-		connector.addEventListener('change', serialize);
-	}
-	if (activeColor) {
-		activeColor.addEventListener('input', serialize);
-	}
-	if (completedColor) {
-		completedColor.addEventListener('input', serialize);
-	}
-	modal.addEventListener('click', function(event){
-		if (event.target === modal) {
-			modal.hidden = true;
-			activeCard = null;
-		}
-	});
-	document.addEventListener('input', serialize);
-	refreshMultiStepControls();
-	serialize();
-})();
-</script>
-JS;
+		return is_string( $encoded ) ? $encoded : '{}';
 	}
 }

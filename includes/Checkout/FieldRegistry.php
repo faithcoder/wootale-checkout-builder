@@ -12,7 +12,7 @@ namespace WooTale\CheckoutBuilder\Checkout;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Defines supported custom checkout fields for the current phase.
+ * Defines supported custom checkout fields.
  */
 final class FieldRegistry {
 	/**
@@ -21,13 +21,15 @@ final class FieldRegistry {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public static function types(): array {
-		$types = array(
-			'text' => array(
-				'label'      => __( 'Text', 'wootale-checkout-builder' ),
-				'maxLength'  => 200,
+		$types = array();
+
+		foreach ( self::core_types() as $type => $label ) {
+			$types[ $type ] = array(
+				'label'      => $label,
+				'maxLength'  => 'textarea' === $type ? 1000 : 200,
 				'metaPrefix' => '_wtcb_',
-			),
-		);
+			);
+		}
 
 		/**
 		 * Filters available WooTale field types.
@@ -44,6 +46,24 @@ final class FieldRegistry {
 	 */
 	public static function is_supported_type( string $type ): bool {
 		return array_key_exists( $type, self::types() );
+	}
+
+	/**
+	 * Get built-in free field types.
+	 *
+	 * @return array<string,string>
+	 */
+	private static function core_types(): array {
+		return array(
+			'text'     => __( 'Text', 'wootale-checkout-builder' ),
+			'email'    => __( 'Email', 'wootale-checkout-builder' ),
+			'tel'      => __( 'Phone', 'wootale-checkout-builder' ),
+			'number'   => __( 'Number', 'wootale-checkout-builder' ),
+			'textarea' => __( 'Textarea', 'wootale-checkout-builder' ),
+			'select'   => __( 'Select', 'wootale-checkout-builder' ),
+			'radio'    => __( 'Radio', 'wootale-checkout-builder' ),
+			'checkbox' => __( 'Checkbox', 'wootale-checkout-builder' ),
+		);
 	}
 
 	/**

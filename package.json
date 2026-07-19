@@ -5,7 +5,8 @@
 	"description": "WooTale classic checkout builder dashboard.",
 	"scripts": {
 		"lint:php": "find . -path ./node_modules -prune -o -path ./vendor -prune -o -path ./.git -prune -o -name '*.php' -print -exec php -l {} \\;",
-		"test:php": "php tests/php/SanitizerTest.php && php tests/php/WorkflowTest.php && php tests/php/ClassicCheckoutTest.php && php tests/php/DiagnosticsTest.php && php tests/php/RoutingTest.php",
+		"lint:wpcs": "vendor/bin/phpcs",
+		"test:php": "php tests/php/SanitizerTest.php && php tests/php/WorkflowTest.php && php tests/php/ClassicCheckoutTest.php && php tests/php/DisplayTest.php && php tests/php/DiagnosticsTest.php && php tests/php/RoutingTest.php",
 		"test": "npm run test:php"
 	}
 }

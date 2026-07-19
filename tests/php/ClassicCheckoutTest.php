@@ -33,6 +33,21 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 	}
 }
 
+if ( ! function_exists( 'sanitize_title' ) ) {
+	function sanitize_title( string $value ): string {
+		$value = strtolower( trim( $value ) );
+		$value = preg_replace( '/[^a-z0-9]+/', '-', $value ) ?: '';
+
+		return trim( $value, '-' );
+	}
+}
+
+if ( ! function_exists( 'wp_unslash' ) ) {
+	function wp_unslash( $value ) {
+		return is_array( $value ) ? array_map( 'wp_unslash', $value ) : stripslashes( (string) $value );
+	}
+}
+
 if ( ! function_exists( '__' ) ) {
 	function __( string $text, string $domain = '' ): string {
 		unset( $domain );
@@ -83,6 +98,39 @@ $workflow = new class() extends Workflow {
 				'priority' => 30,
 				'width'    => 2,
 			),
+			array(
+				'type'      => 'custom',
+				'section'   => 'order',
+				'key'       => 'gift_wrap',
+				'label'     => 'Gift wrap',
+				'fieldType' => 'checkbox',
+				'required'  => false,
+				'enabled'   => true,
+				'priority'  => 40,
+				'width'     => 1,
+				'display'   => array(
+					'orderDetails' => true,
+					'emails'       => true,
+					'thankYou'     => true,
+				),
+			),
+			array(
+				'type'      => 'custom',
+				'section'   => 'order',
+				'key'       => 'delivery_speed',
+				'label'     => 'Delivery speed',
+				'fieldType' => 'radio',
+				'required'  => false,
+				'enabled'   => true,
+				'priority'  => 50,
+				'width'     => 1,
+				'options'   => "Standard delivery\nExpress delivery",
+				'display'   => array(
+					'orderDetails' => true,
+					'emails'       => true,
+					'thankYou'     => true,
+				),
+			),
 		);
 	}
 };
@@ -109,8 +157,42 @@ assert_true( ! isset( $fields['billing']['billing_phone'] ), 'Disabled native fi
 assert_true( isset( $fields['order']['delivery_reference'] ), 'Custom fields are added to classic checkout.' );
 assert_same( true, $fields['order']['delivery_reference']['required'], 'Custom required state is preserved.' );
 assert_true( in_array( 'wtcb-width-2', $fields['order']['delivery_reference']['class'], true ), 'Custom field width class is applied.' );
+assert_same( 'checkbox', $fields['order']['gift_wrap']['type'], 'Checkbox field type is registered.' );
+assert_same( 'radio', $fields['order']['delivery_speed']['type'], 'Radio field type is registered.' );
+assert_same( 'Express delivery', $fields['order']['delivery_speed']['options']['express-delivery'], 'Radio option labels are registered.' );
+
+$order = new FakeOrder();
+$classic->save_custom_fields(
+	$order,
+	array(
+		'delivery_reference' => 'Leave at door',
+		'delivery_speed'     => 'express-delivery',
+	)
+);
+
+assert_same( 'Leave at door', $order->get_meta( '_wtcb_delivery_reference' ), 'Text field value is saved to order meta.' );
+assert_same( 'No', $order->get_meta( '_wtcb_gift_wrap' ), 'Unchecked checkbox is saved as No.' );
+assert_same( 'Express delivery', $order->get_meta( '_wtcb_delivery_speed' ), 'Radio field value is saved as readable label.' );
+assert_same( 'yes', $order->get_meta( '_wtcb_delivery_speed_display_order_details' ), 'Radio order details display flag is saved.' );
+assert_same( 'yes', $order->get_meta( '_wtcb_delivery_speed_display_emails' ), 'Radio email display flag is saved.' );
+assert_same( 'yes', $order->get_meta( '_wtcb_delivery_speed_display_thank_you' ), 'Radio thank-you display flag is saved.' );
 
 echo "ClassicCheckoutTest passed.\n";
+
+final class FakeOrder {
+	/**
+	 * @var array<string,string>
+	 */
+	private $meta = array();
+
+	public function update_meta_data( string $key, string $value ): void {
+		$this->meta[ $key ] = $value;
+	}
+
+	public function get_meta( string $key ): string {
+		return $this->meta[ $key ] ?? '';
+	}
+}
 
 function assert_true( bool $condition, string $message ): void {
 	if ( ! $condition ) {

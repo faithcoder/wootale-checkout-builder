@@ -12,7 +12,7 @@ namespace WooTale\CheckoutBuilder\Compatibility;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Declares compatibility without touching checkout order persistence in Phase 0.
+ * Declares WooCommerce HPOS compatibility.
  */
 final class HPOS {
 	/**

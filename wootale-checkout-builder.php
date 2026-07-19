@@ -4,9 +4,12 @@
  * Plugin URI: https://wootale.com/
  * Description: Dashboard checkout workflow builder for the WooCommerce classic checkout shortcode.
  * Version: 0.7.2
- * Requires at least: 6.9
+ * Requires at least: 6.5
  * Requires PHP: 7.4
+ * Requires Plugins: woocommerce
  * Author: WooTale
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wootale-checkout-builder
  * Domain Path: /languages
  *

@@ -20,7 +20,8 @@ final class Display {
 	 */
 	public function register(): void {
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'render_admin_order_fields' ) );
-		add_action( 'woocommerce_order_details_after_order_table', array( $this, 'render_thank_you_fields' ) );
+		add_action( 'woocommerce_order_details_after_order_table', array( $this, 'render_order_details_fields' ) );
+		add_action( 'woocommerce_thankyou', array( $this, 'render_thank_you_fields' ) );
 		add_action( 'woocommerce_email_order_meta', array( $this, 'render_email_fields' ), 20, 3 );
 		add_filter( 'woocommerce_privacy_export_order_personal_data', array( $this, 'export_order_personal_data' ), 10, 2 );
 		add_filter( 'woocommerce_privacy_erase_order_personal_data', array( $this, 'erase_order_personal_data' ), 10, 2 );
@@ -52,18 +53,46 @@ final class Display {
 	}
 
 	/**
-	 * Render configured fields on the thank-you and My Account order details screens.
+	 * Render configured fields on frontend order details.
 	 *
 	 * @param \WC_Order $order Order object.
 	 */
+	public function render_order_details_fields( $order ): void {
+		$this->render_field_table( $order, 'orderDetails', 'wtcb-order-detail-fields' );
+	}
+
+	/**
+	 * Render configured fields on the thank-you page.
+	 *
+	 * @param int|\WC_Order $order Order ID or order object.
+	 */
 	public function render_thank_you_fields( $order ): void {
-		$fields = $this->get_order_fields( $order, 'thankYou' );
+		if ( is_numeric( $order ) && function_exists( 'wc_get_order' ) ) {
+			$order = wc_get_order( (int) $order );
+		}
+
+		if ( ! $order ) {
+			return;
+		}
+
+		$this->render_field_table( $order, 'thankYou', 'wtcb-thank-you-fields' );
+	}
+
+	/**
+	 * Render a frontend field table for a display location.
+	 *
+	 * @param \WC_Order $order    Order object.
+	 * @param string    $location Display location.
+	 * @param string    $class    Section class.
+	 */
+	private function render_field_table( $order, string $location, string $class ): void {
+		$fields = $this->get_order_fields( $order, $location );
 
 		if ( empty( $fields ) ) {
 			return;
 		}
 
-		echo '<section class="wtcb-thank-you-fields"><h2>' . esc_html__( 'Additional information', 'wootale-checkout-builder' ) . '</h2><table class="woocommerce-table shop_table"><tbody>';
+		echo '<section class="' . esc_attr( $class ) . '"><h2>' . esc_html__( 'Additional information', 'wootale-checkout-builder' ) . '</h2><table class="woocommerce-table shop_table"><tbody>';
 
 		foreach ( $fields as $field ) {
 			printf(

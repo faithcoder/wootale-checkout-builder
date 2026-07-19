@@ -14,7 +14,7 @@ use WooTale\CheckoutBuilder\Compatibility\WooCommerce;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Minimal Phase 1 diagnostics screen.
+ * Minimal diagnostics screen.
  */
 final class Diagnostics {
 	/**

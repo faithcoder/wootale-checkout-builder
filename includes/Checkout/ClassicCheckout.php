@@ -102,8 +102,6 @@ final class ClassicCheckout {
 	 * @param array     $data  Posted checkout data.
 	 */
 	public function save_custom_fields( $order, array $data ): void {
-		unset( $data );
-
 		foreach ( $this->workflow->fields() as $field ) {
 			if ( 'custom' !== $field['type'] || empty( $field['enabled'] ) ) {
 				continue;
@@ -111,11 +109,11 @@ final class ClassicCheckout {
 
 			$key = (string) $field['key'];
 
-			if ( ! isset( $_POST[ $key ] ) ) {
+			if ( ! array_key_exists( $key, $data ) && 'checkbox' !== (string) ( $field['fieldType'] ?? '' ) ) {
 				continue;
 			}
 
-			$value = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
+			$value = $this->sanitize_posted_value_for_field( $field, array_key_exists( $key, $data ) ? $data[ $key ] : '' );
 
 			$order->update_meta_data( FieldRegistry::meta_key( $key ), $value );
 			$order->update_meta_data( FieldRegistry::meta_key( $key ) . '_label', (string) $field['label'] );
@@ -123,6 +121,69 @@ final class ClassicCheckout {
 			$order->update_meta_data( FieldRegistry::meta_key( $key ) . '_display_emails', ! empty( $field['display']['emails'] ) ? 'yes' : 'no' );
 			$order->update_meta_data( FieldRegistry::meta_key( $key ) . '_display_thank_you', ! empty( $field['display']['thankYou'] ) ? 'yes' : 'no' );
 		}
+	}
+
+	/**
+	 * Sanitize a posted checkout value for order meta display.
+	 *
+	 * @param mixed $value Posted value.
+	 */
+	private function sanitize_posted_value( $value ): string {
+		if ( is_array( $value ) ) {
+			$clean = array_map(
+				function ( $item ): string {
+					return sanitize_text_field( (string) $item );
+				},
+				$value
+			);
+
+			return implode( ', ', array_filter( $clean, 'strlen' ) );
+		}
+
+		if ( function_exists( 'sanitize_textarea_field' ) ) {
+			return sanitize_textarea_field( (string) $value );
+		}
+
+		return sanitize_text_field( (string) $value );
+	}
+
+	/**
+	 * Sanitize and normalize a posted value based on its WooTale field type.
+	 *
+	 * @param array<string,mixed> $field Field definition.
+	 * @param mixed               $value Posted value.
+	 */
+	private function sanitize_posted_value_for_field( array $field, $value ): string {
+		$type = isset( $field['fieldType'] ) ? (string) $field['fieldType'] : 'text';
+
+		if ( 'checkbox' === $type ) {
+			return $this->is_checked_value( $value ) ? __( 'Yes', 'wootale-checkout-builder' ) : __( 'No', 'wootale-checkout-builder' );
+		}
+
+		$value = $this->sanitize_posted_value( $value );
+
+		if ( in_array( $type, array( 'select', 'radio' ), true ) ) {
+			$options = $this->checkout_field_options( (string) ( $field['options'] ?? '' ) );
+
+			return isset( $options[ $value ] ) ? $options[ $value ] : $value;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Determine whether a posted checkbox value represents a checked state.
+	 *
+	 * @param mixed $value Posted value.
+	 */
+	private function is_checked_value( $value ): bool {
+		if ( is_array( $value ) ) {
+			return ! empty( $value );
+		}
+
+		$value = strtolower( trim( (string) $value ) );
+
+		return in_array( $value, array( '1', 'yes', 'true', 'on' ), true );
 	}
 
 	/**
@@ -135,13 +196,26 @@ final class ClassicCheckout {
 
 		$workflow = $this->workflow->get();
 
-		wp_register_script( 'wtcb-classic-checkout', false, array(), WTCB_VERSION, true );
-		wp_enqueue_script( 'wtcb-classic-checkout' );
-		wp_add_inline_script( 'wtcb-classic-checkout', 'window.wtcbClassicWorkflow = ' . wp_json_encode( $workflow ) . ';' . $this->frontend_script() );
+		wp_enqueue_script(
+			'wtcb-classic-checkout',
+			WTCB_PLUGIN_URL . 'assets/js/classic-checkout.js',
+			array(),
+			WTCB_VERSION,
+			true
+		);
 
-		wp_register_style( 'wtcb-classic-checkout', false, array(), WTCB_VERSION );
-		wp_enqueue_style( 'wtcb-classic-checkout' );
-		wp_add_inline_style( 'wtcb-classic-checkout', $this->frontend_styles() );
+		wp_add_inline_script(
+			'wtcb-classic-checkout',
+			'window.wtcbClassicWorkflow = ' . $this->encode_json( $workflow ) . ';',
+			'before'
+		);
+
+		wp_enqueue_style(
+			'wtcb-classic-checkout',
+			WTCB_PLUGIN_URL . 'assets/css/classic-checkout.css',
+			array(),
+			WTCB_VERSION
+		);
 	}
 
 	/**
@@ -261,206 +335,15 @@ final class ClassicCheckout {
 		return $parsed;
 	}
 
-	private function frontend_script(): string {
-		return <<<'JS'
-(function () {
-	function ready(callback) {
-		if (document.readyState !== 'loading') {
-			callback();
-			return;
-		}
-		document.addEventListener('DOMContentLoaded', callback);
-	}
 
-	function fieldElement(field) {
-		if (field.type === 'component') {
-			if (field.key === 'order_review') {
-				var orderHeading = document.getElementById('order_review_heading');
-				if (orderHeading) {
-					orderHeading.style.display = 'none';
-				}
-				return document.querySelector('#order_review');
-			}
-			if (field.key === 'payment_methods') {
-				return document.querySelector('#payment .wc_payment_methods');
-			}
-			if (field.key === 'terms') {
-				return document.querySelector('#payment .woocommerce-terms-and-conditions-wrapper');
-			}
-			if (field.key === 'place_order') {
-				return document.querySelector('#payment .place-order');
-			}
-			return null;
-		}
+	/**
+	 * Encode workflow data for the inline checkout controller.
+	 *
+	 * @param array<string,mixed> $data Data to encode.
+	 */
+	private function encode_json( array $data ): string {
+		$encoded = wp_json_encode( $data );
 
-		return document.getElementById(field.key + '_field');
-	}
-
-	function cleanupEmptyNativeSections() {
-		Array.prototype.forEach.call(document.querySelectorAll('.woocommerce-additional-fields'), function(section) {
-			if (!section.querySelector('.form-row, p.form-row, #order_comments_field')) {
-				section.style.display = 'none';
-			}
-		});
-		var payment = document.getElementById('payment');
-		if (payment && !payment.querySelector('.wc_payment_methods, .woocommerce-terms-and-conditions-wrapper, .place-order')) {
-			payment.style.display = 'none';
-		}
-	}
-
-	function mountCheckoutSteps() {
-		var workflow = window.wtcbClassicWorkflow || {};
-		var form = document.querySelector('form.checkout');
-
-		if (!form || !workflow.steps || form.dataset.wtcbClassicMounted === 'true') {
-			return;
-		}
-
-		var host = document.createElement('div');
-		var nav = document.createElement('ol');
-		var panels = document.createElement('div');
-		var state = { active: 0 };
-		var visibleSteps = (workflow.steps || []).filter(function (step) {
-			return (step.fields || []).some(function (field) { return field.enabled !== false; });
-		});
-		var isMultiStep = workflow.multiStepEnabled !== false && visibleSteps.length > 1;
-
-		host.className = 'wtcb-classic-checkout wtcb-orientation-' + (workflow.orientation || 'horizontal') + ' wtcb-indicator-' + (workflow.indicator || 'number') + ' wtcb-connector-' + (workflow.connector || 'solid') + (isMultiStep ? '' : ' is-single-step');
-		nav.className = 'wtcb-classic-steps';
-		panels.className = 'wtcb-classic-panels';
-		if (isMultiStep) {
-			host.append(nav);
-		}
-		host.append(panels);
-		form.prepend(host);
-
-		visibleSteps.forEach(function (step, index) {
-			var item = document.createElement('li');
-			var button = document.createElement('button');
-			var panel = document.createElement('section');
-			var heading = document.createElement('h3');
-			var description = document.createElement('p');
-
-			if (isMultiStep) {
-				button.type = 'button';
-				button.textContent = step.title || ('Step ' + (index + 1));
-				button.dataset.wtcbStep = String(index);
-				button.style.setProperty('--wtcb-active-color', workflow.activeColor || '#2563eb');
-				item.append(button);
-				nav.append(item);
-			}
-
-			panel.className = 'wtcb-classic-panel';
-			panel.dataset.wtcbStep = String(index);
-			panel.style.setProperty('--wtcb-step-color', step.color || '#2563eb');
-			if (isMultiStep) {
-				heading.textContent = step.title || ('Step ' + (index + 1));
-				description.textContent = step.description || '';
-				panel.append(heading, description);
-			}
-
-			(step.fields || []).forEach(function (field) {
-				if (field.enabled === false) {
-					return;
-				}
-
-				var element = fieldElement(field);
-
-				if (!element || element.dataset.wtcbMounted === 'true') {
-					return;
-				}
-
-				element.classList.remove('form-row-first', 'form-row-last', 'form-row-wide', 'wtcb-width-1', 'wtcb-width-2', 'wtcb-width-3');
-				element.classList.add('wtcb-classic-field', 'wtcb-width-' + (field.width || 2));
-				element.dataset.wtcbMounted = 'true';
-				panel.append(element);
-			});
-
-			panels.append(panel);
-		});
-
-		var actions = document.createElement('div');
-		var prev = document.createElement('button');
-		var next = document.createElement('button');
-
-		if (isMultiStep) {
-			actions.className = 'wtcb-classic-actions';
-			prev.type = 'button';
-			next.type = 'button';
-			prev.textContent = 'Previous';
-			next.textContent = 'Continue';
-			actions.append(prev, next);
-			host.append(actions);
-		}
-
-		function render() {
-			if (!isMultiStep) {
-				Array.prototype.forEach.call(panels.children, function (panel) {
-					panel.hidden = false;
-				});
-				return;
-			}
-			Array.prototype.forEach.call(nav.querySelectorAll('button'), function (button, index) {
-				button.setAttribute('aria-current', index === state.active ? 'step' : 'false');
-			});
-			Array.prototype.forEach.call(panels.children, function (panel, index) {
-				panel.hidden = index !== state.active;
-			});
-			prev.hidden = state.active === 0;
-			next.hidden = state.active >= panels.children.length - 1;
-		}
-
-		function go(nextIndex) {
-			state.active = Math.max(0, Math.min(nextIndex, panels.children.length - 1));
-			render();
-		}
-
-		nav.addEventListener('click', function (event) {
-			var button = event.target.closest('button[data-wtcb-step]');
-			if (button) {
-				go(Number(button.dataset.wtcbStep));
-			}
-		});
-		prev.addEventListener('click', function () { go(state.active - 1); });
-		next.addEventListener('click', function () { go(state.active + 1); });
-
-		form.dataset.wtcbClassicMounted = 'true';
-		cleanupEmptyNativeSections();
-		render();
-	}
-
-	ready(mountCheckoutSteps);
-	document.body.addEventListener('updated_checkout', mountCheckoutSteps);
-})();
-JS;
-	}
-
-	private function frontend_styles(): string {
-		return <<<'CSS'
-.wtcb-classic-checkout{--wtcb-active-color:#2563eb;border:1px solid #dbeafe;border-radius:8px;margin-bottom:24px;padding:16px}
-.wtcb-classic-checkout.is-single-step{border:0;margin-bottom:0;padding:0}
-.wtcb-classic-steps{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0 0 16px;padding:0}
-.wtcb-classic-steps button{background:#fff;border:1px solid #dbeafe;border-radius:6px;color:#1f2937;cursor:pointer;padding:8px 12px}
-.wtcb-classic-steps button[aria-current=step]{background:var(--wtcb-active-color,#2563eb);border-color:var(--wtcb-active-color,#2563eb);color:#fff}
-.wtcb-orientation-vertical{display:grid;gap:16px;grid-template-columns:minmax(160px,220px) 1fr}
-.wtcb-orientation-vertical .wtcb-classic-steps{display:grid;margin:0}
-.wtcb-classic-panel{border:1px solid var(--wtcb-step-color,#2563eb);border-radius:8px;display:grid!important;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr));padding:16px}
-.wtcb-classic-panel[hidden]{display:none!important}
-.wtcb-classic-checkout.is-single-step .wtcb-classic-panel{border:0;padding:0}
-.wtcb-classic-panel h3{margin-top:0}
-.wtcb-classic-panel h3,.wtcb-classic-panel>p{grid-column:1/-1}
-.wtcb-classic-panel .wtcb-classic-field{box-sizing:border-box!important;clear:none!important;float:none!important;flex:none!important;margin:0!important;max-width:100%!important;width:auto!important}
-.wtcb-classic-panel .wtcb-width-1{grid-column:span 1!important}
-.wtcb-classic-panel .wtcb-width-2{grid-column:1/-1!important}
-.wtcb-classic-panel #order_review,.wtcb-classic-panel .wc_payment_methods,.wtcb-classic-panel .woocommerce-terms-and-conditions-wrapper,.wtcb-classic-panel .place-order{box-sizing:border-box!important;max-width:100%!important;width:auto!important}
-.wtcb-classic-panel #order_review table{margin:0!important;width:100%!important}
-.wtcb-classic-panel .wc_payment_methods{border:1px solid #d1d5db;list-style:none!important;padding:16px!important}
-.wtcb-classic-panel .place-order{display:grid;gap:14px}
-.wtcb-connector-none .wtcb-classic-steps button{border-color:#e5e7eb}
-.wtcb-indicator-tab .wtcb-classic-steps button{border-radius:0;border-width:0 0 2px}
-.wtcb-classic-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-#customer_details .woocommerce-billing-fields,#customer_details .woocommerce-shipping-fields{display:none}
-@media(max-width:700px){.wtcb-orientation-vertical{display:block}.wtcb-classic-panel{grid-template-columns:1fr}.wtcb-classic-panel .wtcb-width-1,.wtcb-classic-panel .wtcb-width-2{grid-column:1/-1!important}}
-CSS;
+		return is_string( $encoded ) ? $encoded : '{}';
 	}
 }

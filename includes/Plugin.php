@@ -22,7 +22,7 @@ use WooTale\CheckoutBuilder\Compatibility\WooCommerce;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Coordinates Phase 0 services.
+ * Coordinates plugin services.
  */
 final class Plugin {
 	/**
