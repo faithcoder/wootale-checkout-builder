@@ -197,7 +197,7 @@ final class Builder {
 		echo '<div class="wtcb-topbar">';
 		echo '<div class="wtcb-topbar-main"><div class="wtcb-brand"><span class="wtcb-logo">WT</span><h1><strong>WooTale</strong> <span>Checkout Builder</span></h1></div>';
 		echo '<div class="wtcb-actions"><a class="button" href="https://wootale.com/docs" target="_blank" rel="noreferrer">Docs</a><a class="button" href="' . esc_url( $checkout_url ) . '" target="_blank" rel="noreferrer">Preview Checkout</a><button class="button button-primary" type="submit" form="wtcb-builder-form">Save Changes</button></div></div>';
-		echo '<nav class="wtcb-tabs"><a class="is-active" data-wtcb-tab="builder">Classic Builder</a><a>Block Builder</a><a>Fields</a><a data-wtcb-tab="settings">Settings</a><a>Rules</a><a>Analytics <span>Pro</span></a><a>Extensions <span>Pro</span></a></nav>';
+		echo '<nav class="wtcb-tabs"><a class="is-active" data-wtcb-tab="builder">Classic Builder</a><a class="wtcb-tab-disabled" aria-disabled="true">Block Builder <span>' . esc_html__( 'Coming Soon', 'wootale-checkout-builder' ) . '</span></a><a data-wtcb-tab="settings">Settings</a><a class="wtcb-tab-disabled" aria-disabled="true">Rules <span>' . esc_html__( 'Coming Soon', 'wootale-checkout-builder' ) . '</span></a></nav>';
 		echo '</div>';
 	}
 
@@ -319,7 +319,7 @@ final class Builder {
 	 * @param array<string,mixed> $workflow Workflow.
 	 */
 	private function render_steps_panel( array $workflow ): void {
-		echo '<main class="wtcb-card wtcb-canvas"><div class="wtcb-canvas-head"><h2>Checkout Steps <span>' . esc_html( count( $workflow['steps'] ) ) . ' / 3 Free</span></h2></div>';
+		echo '<main class="wtcb-card wtcb-canvas"><div class="wtcb-canvas-head"><h2>Checkout Steps <span>' . esc_html( count( $workflow['steps'] ) ) . ' / 3 Free</span></h2><div class="wtcb-bulk-actions" aria-label="' . esc_attr__( 'Bulk field actions', 'wootale-checkout-builder' ) . '"><button type="button" class="button wtcb-bulk-remove" data-bulk-remove disabled>' . esc_html__( 'Remove', 'wootale-checkout-builder' ) . '</button><button type="button" class="button" data-bulk-show disabled>' . esc_html__( 'Show', 'wootale-checkout-builder' ) . '</button><button type="button" class="button" data-bulk-hide disabled>' . esc_html__( 'Hide', 'wootale-checkout-builder' ) . '</button></div></div>';
 		echo '<div id="wtcb-steps">';
 
 		foreach ( $workflow['steps'] as $index => $step ) {
@@ -333,8 +333,8 @@ final class Builder {
 	 * @param array<string,mixed> $step Step.
 	 */
 	private function render_step( array $step, int $index ): void {
-		echo '<section class="wtcb-step" data-step-index="' . esc_attr( (string) $index ) . '" style="--step-color:' . esc_attr( $step['color'] ) . '">';
-		echo '<div class="wtcb-step-head"><span class="wtcb-drag">::</span><span class="wtcb-badge">' . esc_html( (string) ( $index + 1 ) ) . '</span><div><input class="wtcb-step-title" value="' . esc_attr( $step['title'] ) . '" /><input class="wtcb-step-description" value="' . esc_attr( $step['description'] ) . '" /></div><button type="button" class="wtcb-collapse">⌃</button></div>';
+		echo '<section class="wtcb-step" draggable="true" data-step-index="' . esc_attr( (string) $index ) . '" style="--step-color:' . esc_attr( $step['color'] ) . '">';
+		echo '<div class="wtcb-step-head"><span class="wtcb-drag" title="' . esc_attr__( 'Drag step', 'wootale-checkout-builder' ) . '" aria-hidden="true"></span><span class="wtcb-badge">' . esc_html( (string) ( $index + 1 ) ) . '</span><div><input class="wtcb-step-title" value="' . esc_attr( $step['title'] ) . '" /><input class="wtcb-step-description" value="' . esc_attr( $step['description'] ) . '" /></div><button type="button" class="wtcb-collapse" aria-expanded="true" title="' . esc_attr__( 'Collapse step', 'wootale-checkout-builder' ) . '"><span aria-hidden="true"></span></button></div>';
 		echo '<div class="wtcb-field-list" data-step-fields>';
 
 		foreach ( $step['fields'] as $field ) {
@@ -361,7 +361,7 @@ final class Builder {
 		unset( $is_native );
 
 		printf(
-			'<div class="%1$s" draggable="true" data-field="%2$s"><span class="wtcb-field-handle" title="%3$s">▦</span><button type="button" class="wtcb-field-settings-button" data-open-field-settings title="%5$s">⚙</button><strong>%4$s</strong><span class="wtcb-field-actions"><button type="button" class="wtcb-icon-button" data-duplicate-field %6$s title="%7$s">⧉</button><button type="button" class="wtcb-icon-button wtcb-danger" data-remove-field %8$s title="%9$s">×</button></span></div>',
+			'<div class="%1$s" draggable="true" data-field="%2$s"><span class="wtcb-field-handle" title="%3$s" aria-hidden="true"></span><input type="checkbox" class="wtcb-field-select" aria-label="%10$s" /><strong>%4$s</strong><span class="wtcb-field-actions"><button type="button" class="wtcb-field-settings-button" data-open-field-settings title="%5$s">⚙</button><button type="button" class="wtcb-icon-button" data-duplicate-field %6$s title="%7$s">⧉</button><button type="button" class="wtcb-icon-button wtcb-danger" data-remove-field %8$s title="%9$s">×</button></span></div>',
 			esc_attr( $classes ),
 			esc_attr( $this->encode_json( $field ) ),
 			esc_attr__( 'Drag field', 'wootale-checkout-builder' ),
@@ -370,7 +370,14 @@ final class Builder {
 			$is_custom ? '' : 'disabled',
 			esc_attr__( 'Duplicate field', 'wootale-checkout-builder' ),
 			'',
-			esc_attr__( 'Remove field', 'wootale-checkout-builder' )
+			esc_attr__( 'Remove field', 'wootale-checkout-builder' ),
+			esc_attr(
+				sprintf(
+					/* translators: %s: Field label. */
+					__( 'Select %s for bulk actions', 'wootale-checkout-builder' ),
+					(string) $field['label']
+				)
+			)
 		);
 	}
 

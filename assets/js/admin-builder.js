@@ -1,5 +1,7 @@
 (function(){
 var dragged = null;
+var draggedStep = null;
+var dragIntent = null;
 var paletteField = null;
 var activeCard = null;
 var form = document.getElementById('wtcb-builder-form');
@@ -51,6 +53,7 @@ var modalDisplayEmails = document.getElementById('wtcb-modal-display-emails');
 var modalDisplayThankYou = document.getElementById('wtcb-modal-display-thank-you');
 var modalLockNote = document.getElementById('wtcb-native-lock-note');
 var saveButton = document.querySelector('.wtcb-actions .button-primary');
+var bulkActions = document.querySelector('.wtcb-bulk-actions');
 
 function parseField(card){ try { return JSON.parse(card.dataset.field || '{}'); } catch(e){ return {}; } }
 function fieldWidth(field){ return [1,2].indexOf(Number(field.width)) >= 0 ? Number(field.width) : 2; }
@@ -71,12 +74,28 @@ function setField(card, field){
 	card.classList.add('wtcb-width-' + width);
 	card.querySelector('strong').textContent = field.label || field.key || 'Field';
 }
+function selectedFieldCards(){
+	return Array.prototype.slice.call(document.querySelectorAll('.wtcb-field-select:checked')).map(function(input){
+		return input.closest('.wtcb-field-card');
+	}).filter(Boolean);
+}
+function refreshBulkActions(){
+	var hasSelection = selectedFieldCards().length > 0;
+
+	if (!bulkActions) {
+		return;
+	}
+
+	Array.prototype.forEach.call(bulkActions.querySelectorAll('button'), function(button){
+		button.disabled = !hasSelection;
+	});
+}
 function fieldCard(field){
 	var card = document.createElement('div');
 	field.width = fieldWidth(field);
 	card.className = 'wtcb-field-card wtcb-width-' + field.width;
 	card.draggable = true;
-	card.innerHTML = '<span class="wtcb-field-handle" title="Drag field">▦</span><button type="button" class="wtcb-field-settings-button" data-open-field-settings title="Field settings">⚙</button><strong></strong><span class="wtcb-field-actions"><button type="button" class="wtcb-icon-button" data-duplicate-field title="Duplicate field">⧉</button><button type="button" class="wtcb-icon-button wtcb-danger" data-remove-field title="Remove field">×</button></span>';
+	card.innerHTML = '<span class="wtcb-field-handle" title="Drag field" aria-hidden="true"></span><input type="checkbox" class="wtcb-field-select" aria-label="Select field for bulk actions" /><strong></strong><span class="wtcb-field-actions"><button type="button" class="wtcb-field-settings-button" data-open-field-settings title="Field settings">⚙</button><button type="button" class="wtcb-icon-button" data-duplicate-field title="Duplicate field">⧉</button><button type="button" class="wtcb-icon-button wtcb-danger" data-remove-field title="Remove field">×</button></span>';
 	card.querySelector('[data-duplicate-field]').disabled = field.type !== 'custom';
 	setField(card, field);
 	return card;
@@ -136,9 +155,10 @@ function stepCard(index){
 	var colors = ['#2563eb', '#16a34a', '#7c3aed'];
 	var step = document.createElement('section');
 	step.className = 'wtcb-step';
+	step.draggable = true;
 	step.dataset.stepIndex = String(index);
 	step.style.setProperty('--step-color', colors[index] || '#2563eb');
-	step.innerHTML = '<div class="wtcb-step-head"><span class="wtcb-drag">::</span><span class="wtcb-badge">' + (index + 1) + '</span><div><input class="wtcb-step-title" value="Step ' + (index + 1) + '" /><input class="wtcb-step-description" value="" /></div><button type="button" class="wtcb-collapse">⌃</button></div><div class="wtcb-field-list" data-step-fields></div>';
+	step.innerHTML = '<div class="wtcb-step-head"><span class="wtcb-drag" title="Drag step" aria-hidden="true"></span><span class="wtcb-badge">' + (index + 1) + '</span><div><input class="wtcb-step-title" value="Step ' + (index + 1) + '" /><input class="wtcb-step-description" value="" /></div><button type="button" class="wtcb-collapse" aria-expanded="true" title="Collapse step"><span aria-hidden="true"></span></button></div><div class="wtcb-field-list" data-step-fields></div>';
 	return step;
 }
 function setStepCount(nextCount){
@@ -160,6 +180,17 @@ function setStepCount(nextCount){
 }
 function fieldDropTarget(list, y){
 	var cards = Array.prototype.slice.call(list.querySelectorAll('.wtcb-field-card:not(.is-dragging)'));
+	return cards.reduce(function(closest, child){
+		var box = child.getBoundingClientRect();
+		var offset = y - box.top - box.height / 2;
+		if (offset < 0 && offset > closest.offset) {
+			return { offset: offset, element: child };
+		}
+		return closest;
+	}, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+}
+function stepDropTarget(y){
+	var cards = Array.prototype.slice.call(steps.querySelectorAll('.wtcb-step:not(.is-step-dragging)'));
 	return cards.reduce(function(closest, child){
 		var box = child.getBoundingClientRect();
 		var offset = y - box.top - box.height / 2;
@@ -222,50 +253,112 @@ function showSaveNotice(type, message) {
 	paragraph.textContent = message;
 	notice.replaceChildren(paragraph);
 
-	if (!existing && topbar) {
+if (!existing && topbar) {
 		topbar.insertAdjacentElement('afterend', notice);
 	}
 }
 
+document.addEventListener('pointerdown', function(event){
+	var stepHandle = event.target.closest('.wtcb-drag');
+	var fieldHandle = event.target.closest('.wtcb-field-handle');
+
+	dragIntent = null;
+
+	if (stepHandle) {
+		dragIntent = {
+			step: stepHandle.closest('.wtcb-step')
+		};
+	}
+
+	if (fieldHandle) {
+		dragIntent = {
+			field: fieldHandle.closest('.wtcb-field-card')
+		};
+	}
+});
+document.addEventListener('pointerup', function(){
+	if (!dragged && !draggedStep) {
+		dragIntent = null;
+	}
+});
 document.addEventListener('dragstart', function(event){
 	var card = event.target.closest('.wtcb-field-card');
+	var step = event.target.closest('.wtcb-step');
 	var component = event.target.closest('[data-add-field]');
 	var wooField = event.target.closest('[data-woo-field]');
 	var wooComponent = event.target.closest('[data-woo-component]');
 
+	if (step && dragIntent && dragIntent.step === step) {
+		draggedStep = step;
+		step.classList.add('is-step-dragging');
+		event.dataTransfer.effectAllowed = 'move';
+		event.dataTransfer.setData('text/plain', 'wtcb-step');
+		return;
+	}
+
+	if (step && !card && (!dragIntent || dragIntent.step !== step)) {
+		event.preventDefault();
+		return;
+	}
+
 	if (component) {
 		paletteField = customField(component.dataset.addField, component.textContent.trim());
 		event.dataTransfer.effectAllowed = 'copy';
+		event.dataTransfer.setData('text/plain', 'wtcb-palette-field');
 		return;
 	}
 
 	if (wooField) {
 		paletteField = nativeField(wooField.dataset.section, wooField.dataset.wooField, wooField.textContent.trim(), wooField.dataset.required === '1');
 		event.dataTransfer.effectAllowed = 'copy';
+		event.dataTransfer.setData('text/plain', 'wtcb-woo-field');
 		return;
 	}
 
 	if (wooComponent) {
 		paletteField = componentField(wooComponent.dataset.wooComponent, wooComponent.textContent.trim());
 		event.dataTransfer.effectAllowed = 'copy';
+		event.dataTransfer.setData('text/plain', 'wtcb-woo-component');
 		return;
 	}
 
 	if (card) {
+		if (!dragIntent || dragIntent.field !== card) {
+			event.preventDefault();
+			return;
+		}
 		dragged = card;
 		card.classList.add('is-dragging');
 		event.dataTransfer.effectAllowed = 'move';
+		event.dataTransfer.setData('text/plain', 'wtcb-field');
 	}
 });
 document.addEventListener('dragend', function(){
 	if (dragged) {
 		dragged.classList.remove('is-dragging');
 	}
+	if (draggedStep) {
+		draggedStep.classList.remove('is-step-dragging');
+	}
 	dragged = null;
+	draggedStep = null;
+	dragIntent = null;
 	paletteField = null;
 });
 document.addEventListener('dragover', function(event){
 	var list = event.target.closest('[data-step-fields]');
+	var stepContainer = event.target.closest('#wtcb-steps');
+
+	if (draggedStep && stepContainer) {
+		event.preventDefault();
+		var beforeStep = stepDropTarget(event.clientY);
+		if (beforeStep !== draggedStep) {
+			steps.insertBefore(draggedStep, beforeStep);
+			renumberSteps();
+		}
+		return;
+	}
+
 	if (list) {
 		event.preventDefault();
 		var before = fieldDropTarget(list, event.clientY);
@@ -276,6 +369,17 @@ document.addEventListener('dragover', function(event){
 });
 document.addEventListener('drop', function(event){
 	var list = event.target.closest('[data-step-fields]');
+	var stepContainer = event.target.closest('#wtcb-steps');
+
+	if (draggedStep && stepContainer) {
+		event.preventDefault();
+		draggedStep.classList.remove('is-step-dragging');
+		draggedStep = null;
+		renumberSteps();
+		serialize();
+		return;
+	}
+
 	if (!list) {
 		return;
 	}
@@ -325,6 +429,12 @@ document.addEventListener('click', function(event){
 	}
 	if (event.target.matches('[data-step-count-increase], #wtcb-add-step')) {
 		setStepCount(steps.querySelectorAll('.wtcb-step').length + 1);
+	}
+	if (event.target.matches('.wtcb-collapse')) {
+		var currentStep = event.target.closest('.wtcb-step');
+		var collapsed = currentStep.classList.toggle('is-collapsed');
+		event.target.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+		event.target.title = collapsed ? 'Expand step' : 'Collapse step';
 	}
 	if (event.target.matches('.wtcb-delete-step')) {
 		setStepCount(steps.querySelectorAll('.wtcb-step').length - 1);
@@ -404,6 +514,23 @@ document.addEventListener('click', function(event){
 	}
 	if (event.target.matches('[data-remove-field]') && card && !event.target.disabled) {
 		card.remove();
+		refreshBulkActions();
+		serialize();
+	}
+	if (event.target.matches('[data-bulk-remove]')) {
+		selectedFieldCards().forEach(function(selectedCard){
+			selectedCard.remove();
+		});
+		refreshBulkActions();
+		serialize();
+	}
+	if (event.target.matches('[data-bulk-show], [data-bulk-hide]')) {
+		var enabled = event.target.matches('[data-bulk-show]');
+		selectedFieldCards().forEach(function(selectedCard){
+			var field = parseField(selectedCard);
+			field.enabled = enabled;
+			setField(selectedCard, field);
+		});
 		serialize();
 	}
 	if (event.target.matches('[data-add-field]')) {
@@ -422,6 +549,11 @@ document.addEventListener('click', function(event){
 		var componentList = steps.querySelector('[data-step-fields]');
 		componentList.appendChild(fieldCard(componentField(componentKey, event.target.textContent.trim())));
 		serialize();
+	}
+});
+document.addEventListener('change', function(event){
+	if (event.target.matches('.wtcb-field-select')) {
+		refreshBulkActions();
 	}
 });
 if (stepCount) {
@@ -513,5 +645,6 @@ document.addEventListener('input', serialize);
 refreshMultiStepControls();
 refreshNavigationControls();
 refreshRangeOutputs();
+refreshBulkActions();
 serialize();
 })();
