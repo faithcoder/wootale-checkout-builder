@@ -101,8 +101,9 @@
     gap: 8px;
 }
 .wtcb-settings-list {
-    display: grid;
+    display: flex;
     gap: 14px;
+    justify-content: space-between;
 }
 .wtcb-check-row {
     align-items: flex-start !important;
@@ -133,7 +134,7 @@
 .wtcb-multistep-controls {
     display: grid;
     gap: 16px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 .wtcb-control-card {
     border: 1px solid #e5e7eb;
@@ -717,8 +718,6 @@
     grid-template-columns: 1fr 1fr;
 }
 .wtcb-modal__body label {
-    display: grid;
-    gap: 6px;
     font-weight: 600;
 }
 .wtcb-modal__body input[type="text"],
@@ -728,7 +727,6 @@
     border-radius: 6px;
     box-sizing: border-box;
     min-height: 40px;
-    padding: 8px;
     width: 100%;
 }
 .wtcb-modal__body input[type="range"] {
@@ -837,4 +835,9 @@
         border-bottom: 0;
         padding-bottom: 0;
     }
+}
+input#wtcb-multistep-enabled::before {
+    position: relative;
+    top: 3px;
+    left: 3px;
 }
