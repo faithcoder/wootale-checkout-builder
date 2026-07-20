@@ -300,7 +300,7 @@ final class Builder {
 		foreach ( $basic as $item ) {
 			printf( '<button type="button" draggable="true" class="wtcb-component" data-add-field="%s">%s</button>', esc_attr( $item[0] ), esc_html( $item[1] ) );
 		}
-		echo '</div></details><h3>Advanced Fields <span>Pro</span></h3><div class="wtcb-component-grid is-disabled"><button type="button">Date Picker</button><button type="button">File Upload</button><button type="button">Signature</button><button type="button">Multi Select</button></div>';
+		echo '</div></details><h3>Advanced Fields <span>Coming Soon</span></h3><div class="wtcb-component-grid is-disabled"><button type="button">Date Picker</button><button type="button">File Upload</button><button type="button">Signature</button><button type="button">Multi Select</button></div>';
 		echo '<details class="wtcb-component-accordion" open><summary>WooCommerce Fields</summary>';
 		$this->render_woocommerce_field_group( __( 'Customer Information Fields', 'wootale-checkout-builder' ), $customer );
 		$this->render_woocommerce_field_group( __( 'Billing Fields', 'wootale-checkout-builder' ), $billing );
