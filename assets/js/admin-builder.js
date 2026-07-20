@@ -883,4 +883,73 @@ refreshRangeOutputs();
 refreshBulkActions();
 updateStepSettingsOptions();
 serialize();
+
+var componentSearch = document.querySelector('.wtcb-components .wtcb-search');
+var componentPanel = document.querySelector('.wtcb-components');
+
+if (componentSearch && componentPanel) {
+	componentSearch.addEventListener('input', function() {
+		var term = this.value.trim().toLowerCase();
+		var groups = componentPanel.querySelectorAll('h4.wtcb-component-group-title');
+		var grids = componentPanel.querySelectorAll('.wtcb-component-grid');
+		var details = componentPanel.querySelectorAll('details.wtcb-component-accordion');
+		var advancedHeading = componentPanel.querySelector('h3');
+		var advancedGrid = componentPanel.querySelector('.wtcb-component-grid.is-disabled');
+
+		if (!term) {
+			componentPanel.querySelectorAll('.wtcb-component').forEach(function(btn) {
+				btn.style.display = '';
+			});
+			groups.forEach(function(g) { g.style.display = ''; });
+			grids.forEach(function(g) { g.style.display = ''; });
+			if (advancedHeading) { advancedHeading.style.display = ''; }
+			if (advancedGrid) { advancedGrid.style.display = ''; }
+			return;
+		}
+
+		componentPanel.querySelectorAll('.wtcb-component').forEach(function(btn) {
+			var text = btn.textContent.trim().toLowerCase();
+			btn.style.display = text.indexOf(term) < 0 ? 'none' : '';
+		});
+
+		if (advancedHeading && advancedGrid) {
+			var hasVisibleAdvanced = Array.prototype.some.call(advancedGrid.querySelectorAll('.wtcb-component'), function(btn) {
+				return btn.style.display !== 'none';
+			});
+			advancedHeading.style.display = hasVisibleAdvanced ? '' : 'none';
+			advancedGrid.style.display = hasVisibleAdvanced ? '' : 'none';
+		}
+
+		var visibleGrids = new Set();
+		componentPanel.querySelectorAll('.wtcb-component').forEach(function(btn) {
+			if (btn.style.display !== 'none') {
+				var grid = btn.closest('.wtcb-component-grid');
+				if (grid) { visibleGrids.add(grid); }
+			}
+		});
+		grids.forEach(function(g) {
+			if (!visibleGrids.has(g) && g !== advancedGrid) {
+				g.style.display = 'none';
+			} else if (g !== advancedGrid) {
+				g.style.display = '';
+			}
+		});
+
+		groups.forEach(function(title) {
+			var next = title.nextElementSibling;
+			var hasVisible = false;
+			if (next && next.classList && next.classList.contains('wtcb-component-grid')) {
+				hasVisible = next.style.display !== 'none';
+			}
+			title.style.display = hasVisible ? '' : 'none';
+		});
+
+		details.forEach(function(detail) {
+			var hasVisible = detail.querySelector('.wtcb-component-grid:not([style*="display: none"]) .wtcb-component:not([style*="display: none"])') ||
+				detail.querySelector('.wtcb-component[style=""], .wtcb-component:not([style])');
+			detail.style.display = hasVisible ? '' : 'none';
+		});
+	});
+}
+
 })();

@@ -346,7 +346,7 @@ final class Builder {
 			$this->render_step( $step, $index );
 		}
 
-		echo '</div><button type="button" class="wtcb-add-step" id="wtcb-add-step">+ Add Step<br><small>You can add up to 3 steps in the free version.</small></button></main>';
+		echo '</div><button type="button" class="wtcb-add-step" id="wtcb-add-step">+ Add Step<br><small>You can add up to 3 steps.</small></button></main>';
 	}
 
 	/**
