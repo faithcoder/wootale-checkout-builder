@@ -1,12 +1,12 @@
 {
-	"name": "wootale/wootale-checkout-builder",
-	"description": "WooTale Checkout Builder free plugin.",
+	"name": "checkoutly/checkoutly",
+	"description": "Checkoutly Checkout Builder free plugin.",
 	"version": "0.7.2",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"autoload": {
 		"psr-4": {
-			"WooTale\\CheckoutBuilder\\": "includes/"
+			"Checkoutly\\CheckoutBuilder\\": "includes/"
 		}
 	},
 	"require": {

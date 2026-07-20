@@ -2,12 +2,12 @@
 /**
  * WooCommerce HPOS compatibility declaration.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Compatibility;
+namespace Checkoutly\CheckoutBuilder\Compatibility;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -30,6 +30,6 @@ final class HPOS {
 			return;
 		}
 
-		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', WTCB_PLUGIN_FILE, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', CHECKOUTLY_PLUGIN_FILE, true );
 	}
 }

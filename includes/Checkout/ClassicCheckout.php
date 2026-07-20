@@ -2,17 +2,17 @@
 /**
  * Classic shortcode checkout integration.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Checkout;
+namespace Checkoutly\CheckoutBuilder\Checkout;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Applies WooTale workflow settings to WooCommerce classic checkout.
+ * Applies Checkoutly workflow settings to WooCommerce classic checkout.
  */
 final class ClassicCheckout {
 	/**
@@ -148,7 +148,7 @@ final class ClassicCheckout {
 	}
 
 	/**
-	 * Sanitize and normalize a posted value based on its WooTale field type.
+	 * Sanitize and normalize a posted value based on its Checkoutly field type.
 	 *
 	 * @param array<string,mixed> $field Field definition.
 	 * @param mixed               $value Posted value.
@@ -157,7 +157,7 @@ final class ClassicCheckout {
 		$type = isset( $field['fieldType'] ) ? (string) $field['fieldType'] : 'text';
 
 		if ( 'checkbox' === $type ) {
-			return $this->is_checked_value( $value ) ? __( 'Yes', 'wootale-checkout-builder' ) : __( 'No', 'wootale-checkout-builder' );
+			return $this->is_checked_value( $value ) ? __( 'Yes', 'checkoutly' ) : __( 'No', 'checkoutly' );
 		}
 
 		$value = $this->sanitize_posted_value( $value );
@@ -197,31 +197,31 @@ final class ClassicCheckout {
 		$workflow = $this->workflow->get();
 
 		wp_enqueue_script(
-			'wtcb-classic-checkout',
-			WTCB_PLUGIN_URL . 'assets/js/classic-checkout.js',
+			'checkoutly-classic-checkout',
+			CHECKOUTLY_PLUGIN_URL . 'assets/js/classic-checkout.js',
 			array(),
-			WTCB_VERSION,
+			CHECKOUTLY_VERSION,
 			true
 		);
 
 		wp_add_inline_script(
-			'wtcb-classic-checkout',
-			'window.wtcbClassicWorkflow = ' . $this->encode_json( $workflow ) . ';',
+			'checkoutly-classic-checkout',
+			'window.checkoutlyClassicWorkflow = ' . $this->encode_json( $workflow ) . ';',
 			'before'
 		);
 
 		wp_enqueue_style(
-			'wtcb-classic-checkout',
-			WTCB_PLUGIN_URL . 'assets/css/classic-checkout.css',
+			'checkoutly-classic-checkout',
+			CHECKOUTLY_PLUGIN_URL . 'assets/css/classic-checkout.css',
 			array(),
-			WTCB_VERSION
+			CHECKOUTLY_VERSION
 		);
 	}
 
 	/**
 	 * Build a custom WooCommerce checkout field definition.
 	 *
-	 * @param array<string,mixed> $field    WooTale field.
+	 * @param array<string,mixed> $field    Checkoutly field.
 	 * @param int                 $position Position.
 	 * @return array<string,mixed>
 	 */
@@ -232,7 +232,7 @@ final class ClassicCheckout {
 			'type'     => $type,
 			'label'    => (string) $field['label'],
 			'required' => ! empty( $field['required'] ),
-			'class'    => $this->field_classes( array( 'form-row-wide', 'wtcb-custom-checkout-field' ), $field ),
+			'class'    => $this->field_classes( array( 'form-row-wide', 'checkoutly-custom-checkout-field' ), $field ),
 			'default'  => (string) ( $field['default'] ?? '' ),
 			'placeholder' => (string) ( $field['placeholder'] ?? '' ),
 			'validate' => ! empty( $field['validation'] ) && is_array( $field['validation'] ) ? array_values( array_unique( $field['validation'] ) ) : array(),
@@ -247,10 +247,10 @@ final class ClassicCheckout {
 	}
 
 	/**
-	 * Get WooCommerce field wrapper classes for a WooTale field.
+	 * Get WooCommerce field wrapper classes for a Checkoutly field.
 	 *
 	 * @param mixed               $classes Existing classes.
-	 * @param array<string,mixed> $field   WooTale field.
+	 * @param array<string,mixed> $field   Checkoutly field.
 	 * @return array<int,string>
 	 */
 	private function field_classes( $classes, array $field ): array {
@@ -261,13 +261,13 @@ final class ClassicCheckout {
 			array_filter(
 				$classes,
 				static function ( $class ): bool {
-					return is_string( $class ) && 0 !== strpos( $class, 'wtcb-width-' );
+					return is_string( $class ) && 0 !== strpos( $class, 'checkoutly-width-' );
 				}
 			)
 		);
 
-		$classes[] = 'wtcb-classic-field';
-		$classes[] = 'wtcb-width-' . ( in_array( $width, array( 1, 2 ), true ) ? $width : 2 );
+		$classes[] = 'checkoutly-classic-field';
+		$classes[] = 'checkoutly-width-' . ( in_array( $width, array( 1, 2 ), true ) ? $width : 2 );
 
 		return array_values( array_unique( $classes ) );
 	}
@@ -327,8 +327,8 @@ final class ClassicCheckout {
 
 		if ( empty( $parsed ) ) {
 			return array(
-				''       => __( 'Select an option', 'wootale-checkout-builder' ),
-				'option' => __( 'Option', 'wootale-checkout-builder' ),
+				''       => __( 'Select an option', 'checkoutly' ),
+				'option' => __( 'Option', 'checkoutly' ),
 			);
 		}
 

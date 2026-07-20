@@ -4,66 +4,66 @@ var draggedStep = null;
 var dragIntent = null;
 var paletteField = null;
 var activeCard = null;
-var form = document.getElementById('wtcb-builder-form');
-var steps = document.getElementById('wtcb-steps');
-var input = document.getElementById('wtcb-workflow-input');
-var builderView = document.getElementById('wtcb-builder-view');
-var globalSettings = document.getElementById('wtcb-global-settings');
-var multiStepEnabled = document.getElementById('wtcb-multistep-enabled');
-var multiStepModal = document.getElementById('wtcb-multistep-modal');
-var openMultiStepSettings = document.getElementById('wtcb-open-multistep-settings');
-var multiStepControls = document.getElementById('wtcb-multistep-controls');
-var canvasCount = document.querySelector('.wtcb-canvas-head h2 span');
-var stepCount = document.getElementById('wtcb-step-count');
-var indicatorSelect = document.getElementById('wtcb-indicator-select');
-var connector = document.getElementById('wtcb-connector');
-var connectorThickness = document.getElementById('wtcb-connector-thickness');
-var connectorGap = document.getElementById('wtcb-connector-gap');
-var activeColor = document.getElementById('wtcb-active-color');
-var completedColor = document.getElementById('wtcb-completed-color');
-var inactiveColor = document.getElementById('wtcb-inactive-color');
-var previousText = document.getElementById('wtcb-previous-text');
-var nextText = document.getElementById('wtcb-next-text');
-var continueText = document.getElementById('wtcb-continue-text');
-var previousButtonColor = document.getElementById('wtcb-previous-button-color');
-var previousButtonBg = document.getElementById('wtcb-previous-button-bg');
-var nextButtonColor = document.getElementById('wtcb-next-button-color');
-var nextButtonBg = document.getElementById('wtcb-next-button-bg');
-var continueButtonColor = document.getElementById('wtcb-continue-button-color');
-var continueButtonBg = document.getElementById('wtcb-continue-button-bg');
-var allowCompleted = document.getElementById('wtcb-allow-completed');
-var scrollOnChange = document.getElementById('wtcb-scroll-on-change');
-var validateBeforeNext = document.getElementById('wtcb-validate-before-next');
-var rememberStep = document.getElementById('wtcb-remember-step');
-var modal = document.getElementById('wtcb-field-modal');
-var modalTitle = document.getElementById('wtcb-field-modal-title');
-var modalFieldType = document.getElementById('wtcb-modal-field-type');
-var modalStep = document.getElementById('wtcb-modal-step');
-var modalLabel = document.getElementById('wtcb-modal-label');
-var modalKey = document.getElementById('wtcb-modal-key');
-var modalDefault = document.getElementById('wtcb-modal-default');
-var modalPlaceholder = document.getElementById('wtcb-modal-placeholder');
-var modalOptions = document.getElementById('wtcb-modal-options');
-var modalOptionEditor = document.querySelector('.wtcb-option-editor');
-var modalValidation = document.getElementById('wtcb-modal-validation');
-var modalWidth = document.getElementById('wtcb-modal-width');
-var modalRequired = document.getElementById('wtcb-modal-required');
-var modalEnabled = document.getElementById('wtcb-modal-enabled');
-var modalDisplayOrder = document.getElementById('wtcb-modal-display-order');
-var modalDisplayEmails = document.getElementById('wtcb-modal-display-emails');
-var modalDisplayThankYou = document.getElementById('wtcb-modal-display-thank-you');
-var modalLockNote = document.getElementById('wtcb-native-lock-note');
-var saveButton = document.querySelector('.wtcb-actions .button-primary');
-var bulkActions = document.querySelector('.wtcb-bulk-actions');
-var stepSettingsSelect = document.getElementById('wtcb-step-settings-select');
-var stepTitleColor = document.getElementById('wtcb-step-title-color');
-var stepBackgroundColor = document.getElementById('wtcb-step-background-color');
-var stepBorderStyle = document.getElementById('wtcb-step-border-style');
-var stepBorderWidth = document.getElementById('wtcb-step-border-width');
-var stepBorderRadius = document.getElementById('wtcb-step-border-radius');
-var stepBorderColor = document.getElementById('wtcb-step-border-color');
-var stepPadding = document.getElementById('wtcb-step-padding');
-var stepMargin = document.getElementById('wtcb-step-margin');
+var form = document.getElementById('checkoutly-builder-form');
+var steps = document.getElementById('checkoutly-steps');
+var input = document.getElementById('checkoutly-workflow-input');
+var builderView = document.getElementById('checkoutly-builder-view');
+var globalSettings = document.getElementById('checkoutly-global-settings');
+var multiStepEnabled = document.getElementById('checkoutly-multistep-enabled');
+var multiStepModal = document.getElementById('checkoutly-multistep-modal');
+var openMultiStepSettings = document.getElementById('checkoutly-open-multistep-settings');
+var multiStepControls = document.getElementById('checkoutly-multistep-controls');
+var canvasCount = document.querySelector('.checkoutly-canvas-head h2 span');
+var stepCount = document.getElementById('checkoutly-step-count');
+var indicatorSelect = document.getElementById('checkoutly-indicator-select');
+var connector = document.getElementById('checkoutly-connector');
+var connectorThickness = document.getElementById('checkoutly-connector-thickness');
+var connectorGap = document.getElementById('checkoutly-connector-gap');
+var activeColor = document.getElementById('checkoutly-active-color');
+var completedColor = document.getElementById('checkoutly-completed-color');
+var inactiveColor = document.getElementById('checkoutly-inactive-color');
+var previousText = document.getElementById('checkoutly-previous-text');
+var nextText = document.getElementById('checkoutly-next-text');
+var continueText = document.getElementById('checkoutly-continue-text');
+var previousButtonColor = document.getElementById('checkoutly-previous-button-color');
+var previousButtonBg = document.getElementById('checkoutly-previous-button-bg');
+var nextButtonColor = document.getElementById('checkoutly-next-button-color');
+var nextButtonBg = document.getElementById('checkoutly-next-button-bg');
+var continueButtonColor = document.getElementById('checkoutly-continue-button-color');
+var continueButtonBg = document.getElementById('checkoutly-continue-button-bg');
+var allowCompleted = document.getElementById('checkoutly-allow-completed');
+var scrollOnChange = document.getElementById('checkoutly-scroll-on-change');
+var validateBeforeNext = document.getElementById('checkoutly-validate-before-next');
+var rememberStep = document.getElementById('checkoutly-remember-step');
+var modal = document.getElementById('checkoutly-field-modal');
+var modalTitle = document.getElementById('checkoutly-field-modal-title');
+var modalFieldType = document.getElementById('checkoutly-modal-field-type');
+var modalStep = document.getElementById('checkoutly-modal-step');
+var modalLabel = document.getElementById('checkoutly-modal-label');
+var modalKey = document.getElementById('checkoutly-modal-key');
+var modalDefault = document.getElementById('checkoutly-modal-default');
+var modalPlaceholder = document.getElementById('checkoutly-modal-placeholder');
+var modalOptions = document.getElementById('checkoutly-modal-options');
+var modalOptionEditor = document.querySelector('.checkoutly-option-editor');
+var modalValidation = document.getElementById('checkoutly-modal-validation');
+var modalWidth = document.getElementById('checkoutly-modal-width');
+var modalRequired = document.getElementById('checkoutly-modal-required');
+var modalEnabled = document.getElementById('checkoutly-modal-enabled');
+var modalDisplayOrder = document.getElementById('checkoutly-modal-display-order');
+var modalDisplayEmails = document.getElementById('checkoutly-modal-display-emails');
+var modalDisplayThankYou = document.getElementById('checkoutly-modal-display-thank-you');
+var modalLockNote = document.getElementById('checkoutly-native-lock-note');
+var saveButton = document.querySelector('.checkoutly-actions .button-primary');
+var bulkActions = document.querySelector('.checkoutly-bulk-actions');
+var stepSettingsSelect = document.getElementById('checkoutly-step-settings-select');
+var stepTitleColor = document.getElementById('checkoutly-step-title-color');
+var stepBackgroundColor = document.getElementById('checkoutly-step-background-color');
+var stepBorderStyle = document.getElementById('checkoutly-step-border-style');
+var stepBorderWidth = document.getElementById('checkoutly-step-border-width');
+var stepBorderRadius = document.getElementById('checkoutly-step-border-radius');
+var stepBorderColor = document.getElementById('checkoutly-step-border-color');
+var stepPadding = document.getElementById('checkoutly-step-padding');
+var stepMargin = document.getElementById('checkoutly-step-margin');
 
 function parseField(card){ try { return JSON.parse(card.dataset.field || '{}'); } catch(e){ return {}; } }
 function fieldWidth(field){ return [1,2].indexOf(Number(field.width)) >= 0 ? Number(field.width) : 2; }
@@ -80,13 +80,13 @@ function setField(card, field){
 	field.display = displayOptions(field);
 	card.dataset.field = JSON.stringify(field);
 	card.classList.toggle('is-disabled', field.enabled === false);
-	card.classList.remove('wtcb-width-1', 'wtcb-width-2', 'wtcb-width-3');
-	card.classList.add('wtcb-width-' + width);
+	card.classList.remove('checkoutly-width-1', 'checkoutly-width-2', 'checkoutly-width-3');
+	card.classList.add('checkoutly-width-' + width);
 	card.querySelector('strong').textContent = field.label || field.key || 'Field';
 }
 function selectedFieldCards(){
-	return Array.prototype.slice.call(document.querySelectorAll('.wtcb-field-select:checked')).map(function(input){
-		return input.closest('.wtcb-field-card');
+	return Array.prototype.slice.call(document.querySelectorAll('.checkoutly-field-select:checked')).map(function(input){
+		return input.closest('.checkoutly-field-card');
 	}).filter(Boolean);
 }
 function refreshBulkActions(){
@@ -128,18 +128,18 @@ function applyStepStyle(step, style){
 
 	style = Object.assign(defaultStepStyle(getComputedStyle(step).getPropertyValue('--step-color').trim()), style || {});
 	step.dataset.stepStyle = JSON.stringify(style);
-	step.style.setProperty('--wtcb-step-title-color', style.titleColor);
-	step.style.setProperty('--wtcb-step-bg', style.backgroundColor);
-	step.style.setProperty('--wtcb-step-border-style', style.borderStyle);
-	step.style.setProperty('--wtcb-step-border-width', Number(style.borderWidth) + 'px');
-	step.style.setProperty('--wtcb-step-radius', Number(style.borderRadius) + 'px');
-	step.style.setProperty('--wtcb-step-border-color', style.borderColor);
-	step.style.setProperty('--wtcb-step-padding', Number(style.padding) + 'px');
-	step.style.setProperty('--wtcb-step-margin', Number(style.margin) + 'px');
+	step.style.setProperty('--checkoutly-step-title-color', style.titleColor);
+	step.style.setProperty('--checkoutly-step-bg', style.backgroundColor);
+	step.style.setProperty('--checkoutly-step-border-style', style.borderStyle);
+	step.style.setProperty('--checkoutly-step-border-width', Number(style.borderWidth) + 'px');
+	step.style.setProperty('--checkoutly-step-radius', Number(style.borderRadius) + 'px');
+	step.style.setProperty('--checkoutly-step-border-color', style.borderColor);
+	step.style.setProperty('--checkoutly-step-padding', Number(style.padding) + 'px');
+	step.style.setProperty('--checkoutly-step-margin', Number(style.margin) + 'px');
 }
 function selectedSettingsStep(){
 	var index = stepSettingsSelect ? Number(stepSettingsSelect.value) || 0 : 0;
-	return steps.querySelectorAll('.wtcb-step')[index] || steps.querySelector('.wtcb-step');
+	return steps.querySelectorAll('.checkoutly-step')[index] || steps.querySelector('.checkoutly-step');
 }
 function loadStepSettingsControls(){
 	var step = selectedSettingsStep();
@@ -166,14 +166,14 @@ function updateStepSettingsOptions(){
 	}
 
 	stepSettingsSelect.innerHTML = '';
-	steps.querySelectorAll('.wtcb-step').forEach(function(step, index){
+	steps.querySelectorAll('.checkoutly-step').forEach(function(step, index){
 		var option = document.createElement('option');
-		var title = step.querySelector('.wtcb-step-title').value || ('Step ' + (index + 1));
+		var title = step.querySelector('.checkoutly-step-title').value || ('Step ' + (index + 1));
 		option.value = String(index);
 		option.textContent = title;
 		stepSettingsSelect.appendChild(option);
 	});
-	stepSettingsSelect.value = Number(selected) < steps.querySelectorAll('.wtcb-step').length ? selected : '0';
+	stepSettingsSelect.value = Number(selected) < steps.querySelectorAll('.checkoutly-step').length ? selected : '0';
 	loadStepSettingsControls();
 }
 function updateModalStepOptions(selectedStep){
@@ -182,9 +182,9 @@ function updateModalStepOptions(selectedStep){
 	}
 
 	modalStep.innerHTML = '';
-	steps.querySelectorAll('.wtcb-step').forEach(function(step, index){
+	steps.querySelectorAll('.checkoutly-step').forEach(function(step, index){
 		var option = document.createElement('option');
-		var title = step.querySelector('.wtcb-step-title').value || ('Step ' + (index + 1));
+		var title = step.querySelector('.checkoutly-step-title').value || ('Step ' + (index + 1));
 		option.value = String(index);
 		option.textContent = title;
 		modalStep.appendChild(option);
@@ -226,7 +226,7 @@ function refreshOptionEditor(){
 	modalOptionEditor.hidden = !fieldTypeSupportsOptions(modalFieldType.value);
 }
 function optionValuesFromEditor(){
-	return Array.prototype.slice.call(modalOptions.querySelectorAll('.wtcb-option-value')).map(function(input){
+	return Array.prototype.slice.call(modalOptions.querySelectorAll('.checkoutly-option-value')).map(function(input){
 		return input.value.trim();
 	}).filter(Boolean);
 }
@@ -236,18 +236,18 @@ function addOptionRow(value){
 	var edit = document.createElement('button');
 	var remove = document.createElement('button');
 
-	row.className = 'wtcb-option-row';
+	row.className = 'checkoutly-option-row';
 	input.type = 'text';
-	input.className = 'wtcb-option-value';
+	input.className = 'checkoutly-option-value';
 	input.value = value || '';
 	input.placeholder = 'Option label';
 	edit.type = 'button';
-	edit.className = 'wtcb-icon-button';
+	edit.className = 'checkoutly-icon-button';
 	edit.dataset.editOption = '1';
 	edit.title = 'Edit option';
 	edit.textContent = '✎';
 	remove.type = 'button';
-	remove.className = 'wtcb-icon-button wtcb-danger';
+	remove.className = 'checkoutly-icon-button checkoutly-danger';
 	remove.dataset.removeOption = '1';
 	remove.title = 'Remove option';
 	remove.textContent = '×';
@@ -260,7 +260,7 @@ function renderOptionRows(value){
 }
 function removeSelectedStep(){
 	var step = selectedSettingsStep();
-	var allSteps = steps.querySelectorAll('.wtcb-step');
+	var allSteps = steps.querySelectorAll('.checkoutly-step');
 	var selectedIndex = stepSettingsSelect ? Number(stepSettingsSelect.value) || 0 : 0;
 
 	if (!step || allSteps.length <= 1) {
@@ -278,15 +278,15 @@ function removeSelectedStep(){
 function fieldCard(field){
 	var card = document.createElement('div');
 	field.width = fieldWidth(field);
-	card.className = 'wtcb-field-card wtcb-width-' + field.width;
+	card.className = 'checkoutly-field-card checkoutly-width-' + field.width;
 	card.draggable = true;
-	card.innerHTML = '<span class="wtcb-field-handle" title="Drag field" aria-hidden="true"></span><input type="checkbox" class="wtcb-field-select" aria-label="Select field for bulk actions" /><strong></strong><span class="wtcb-field-actions"><button type="button" class="wtcb-field-settings-button" data-open-field-settings title="Field settings">⚙</button><button type="button" class="wtcb-icon-button" data-duplicate-field title="Duplicate field">⧉</button><button type="button" class="wtcb-icon-button wtcb-danger" data-remove-field title="Remove field">×</button></span>';
+	card.innerHTML = '<span class="checkoutly-field-handle" title="Drag field" aria-hidden="true"></span><input type="checkbox" class="checkoutly-field-select" aria-label="Select field for bulk actions" /><strong></strong><span class="checkoutly-field-actions"><button type="button" class="checkoutly-field-settings-button" data-open-field-settings title="Field settings">⚙</button><button type="button" class="checkoutly-icon-button" data-duplicate-field title="Duplicate field">⧉</button><button type="button" class="checkoutly-icon-button checkoutly-danger" data-remove-field title="Remove field">×</button></span>';
 	card.querySelector('[data-duplicate-field]').disabled = field.type !== 'custom';
 	setField(card, field);
 	return card;
 }
 function customField(type, label) {
-	var key = 'wtcb_' + type + '_' + Date.now();
+	var key = 'checkoutly_' + type + '_' + Date.now();
 	return { id:key, key:key, section:'order', type:'custom', fieldType:type, label:label, required:false, enabled:true, width:2, default:'', placeholder:'', options:'', validation:[], display:{ orderDetails:true, emails:true, thankYou:true } };
 }
 function nativeField(section, key, label, required) {
@@ -301,7 +301,7 @@ function settingValue(name, fallback) {
 }
 function refreshNavigationControls(){
 	var navigation = settingValue('navigation', 'line');
-	Array.prototype.forEach.call(document.querySelectorAll('.wtcb-line-setting'), function(control){
+	Array.prototype.forEach.call(document.querySelectorAll('.checkoutly-line-setting'), function(control){
 		control.hidden = navigation !== 'line';
 	});
 }
@@ -311,8 +311,8 @@ function refreshMultiStepControls(){
 	}
 }
 function refreshRangeOutputs(){
-	var thicknessOutput = document.getElementById('wtcb-connector-thickness-output');
-	var gapOutput = document.getElementById('wtcb-connector-gap-output');
+	var thicknessOutput = document.getElementById('checkoutly-connector-thickness-output');
+	var gapOutput = document.getElementById('checkoutly-connector-gap-output');
 
 	if (thicknessOutput && connectorThickness) {
 		thicknessOutput.textContent = connectorThickness.value + 'px';
@@ -322,33 +322,33 @@ function refreshRangeOutputs(){
 	}
 }
 function renumberSteps(){
-	steps.querySelectorAll('.wtcb-step').forEach(function(step, index){
+	steps.querySelectorAll('.checkoutly-step').forEach(function(step, index){
 		step.dataset.stepIndex = String(index);
-		var badge = step.querySelector('.wtcb-badge');
+		var badge = step.querySelector('.checkoutly-badge');
 		if (badge) {
 			badge.textContent = String(index + 1);
 		}
 	});
 	if (stepCount) {
-		stepCount.value = String(steps.querySelectorAll('.wtcb-step').length);
+		stepCount.value = String(steps.querySelectorAll('.checkoutly-step').length);
 	}
 	if (canvasCount) {
-		canvasCount.textContent = steps.querySelectorAll('.wtcb-step').length + ' / 3 Free';
+		canvasCount.textContent = steps.querySelectorAll('.checkoutly-step').length + ' / 3 Free';
 	}
 }
 function stepCard(index){
 	var colors = ['#2563eb', '#16a34a', '#7c3aed'];
 	var step = document.createElement('section');
-	step.className = 'wtcb-step';
+	step.className = 'checkoutly-step';
 	step.draggable = true;
 	step.dataset.stepIndex = String(index);
 	step.style.setProperty('--step-color', colors[index] || '#2563eb');
-	step.innerHTML = '<div class="wtcb-step-head"><span class="wtcb-drag" title="Drag step" aria-hidden="true"></span><span class="wtcb-badge">' + (index + 1) + '</span><div><input class="wtcb-step-title" value="Step ' + (index + 1) + '" /><input class="wtcb-step-description" value="" /></div><button type="button" class="wtcb-collapse" aria-expanded="true" title="Collapse step"><span aria-hidden="true"></span></button></div><div class="wtcb-field-list" data-step-fields></div>';
+	step.innerHTML = '<div class="checkoutly-step-head"><span class="checkoutly-drag" title="Drag step" aria-hidden="true"></span><span class="checkoutly-badge">' + (index + 1) + '</span><div><input class="checkoutly-step-title" value="Step ' + (index + 1) + '" /><input class="checkoutly-step-description" value="" /></div><button type="button" class="checkoutly-collapse" aria-expanded="true" title="Collapse step"><span aria-hidden="true"></span></button></div><div class="checkoutly-field-list" data-step-fields></div>';
 	applyStepStyle(step, defaultStepStyle(colors[index] || '#2563eb'));
 	return step;
 }
 function setStepCount(nextCount){
-	var current = steps.querySelectorAll('.wtcb-step').length;
+	var current = steps.querySelectorAll('.checkoutly-step').length;
 	nextCount = Math.max(1, Math.min(3, Number(nextCount) || current));
 
 	while (current < nextCount) {
@@ -366,7 +366,7 @@ function setStepCount(nextCount){
 	serialize();
 }
 function fieldDropTarget(list, y){
-	var cards = Array.prototype.slice.call(list.querySelectorAll('.wtcb-field-card:not(.is-dragging)'));
+	var cards = Array.prototype.slice.call(list.querySelectorAll('.checkoutly-field-card:not(.is-dragging)'));
 	return cards.reduce(function(closest, child){
 		var box = child.getBoundingClientRect();
 		var offset = y - box.top - box.height / 2;
@@ -377,7 +377,7 @@ function fieldDropTarget(list, y){
 	}, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
 }
 function stepDropTarget(y){
-	var cards = Array.prototype.slice.call(steps.querySelectorAll('.wtcb-step:not(.is-step-dragging)'));
+	var cards = Array.prototype.slice.call(steps.querySelectorAll('.checkoutly-step:not(.is-step-dragging)'));
 	return cards.reduce(function(closest, child){
 		var box = child.getBoundingClientRect();
 		var offset = y - box.top - box.height / 2;
@@ -416,13 +416,13 @@ function serialize(){
 		rememberStep: rememberStep ? rememberStep.checked : false,
 		steps: []
 	};
-	steps.querySelectorAll('.wtcb-step').forEach(function(step, index){
+	steps.querySelectorAll('.checkoutly-step').forEach(function(step, index){
 		var fields = [];
-		step.querySelectorAll('.wtcb-field-card').forEach(function(card){ fields.push(parseField(card)); });
+		step.querySelectorAll('.checkoutly-field-card').forEach(function(card){ fields.push(parseField(card)); });
 		workflow.steps.push({
-			id: 'wtcb_step_' + (index + 1),
-			title: step.querySelector('.wtcb-step-title').value || ('Step ' + (index + 1)),
-			description: step.querySelector('.wtcb-step-description').value || '',
+			id: 'checkoutly_step_' + (index + 1),
+			title: step.querySelector('.checkoutly-step-title').value || ('Step ' + (index + 1)),
+			description: step.querySelector('.checkoutly-step-description').value || '',
 			color: getComputedStyle(step).getPropertyValue('--step-color').trim() || '#2563eb',
 			style: parseStepStyle(step),
 			fields: fields
@@ -432,12 +432,12 @@ function serialize(){
 	renumberSteps();
 }
 function showSaveNotice(type, message) {
-	var existing = document.querySelector('.wtcb-save-notice');
-	var topbar = document.querySelector('.wtcb-topbar');
+	var existing = document.querySelector('.checkoutly-save-notice');
+	var topbar = document.querySelector('.checkoutly-topbar');
 	var notice = existing || document.createElement('div');
 	var paragraph = document.createElement('p');
 
-	notice.className = 'notice wtcb-save-notice ' + (type === 'success' ? 'notice-success' : 'notice-error');
+	notice.className = 'notice checkoutly-save-notice ' + (type === 'success' ? 'notice-success' : 'notice-error');
 	paragraph.textContent = message;
 	notice.replaceChildren(paragraph);
 
@@ -447,20 +447,20 @@ if (!existing && topbar) {
 }
 
 document.addEventListener('pointerdown', function(event){
-	var stepHandle = event.target.closest('.wtcb-drag');
-	var fieldHandle = event.target.closest('.wtcb-field-handle');
+	var stepHandle = event.target.closest('.checkoutly-drag');
+	var fieldHandle = event.target.closest('.checkoutly-field-handle');
 
 	dragIntent = null;
 
 	if (stepHandle) {
 		dragIntent = {
-			step: stepHandle.closest('.wtcb-step')
+			step: stepHandle.closest('.checkoutly-step')
 		};
 	}
 
 	if (fieldHandle) {
 		dragIntent = {
-			field: fieldHandle.closest('.wtcb-field-card')
+			field: fieldHandle.closest('.checkoutly-field-card')
 		};
 	}
 });
@@ -470,8 +470,8 @@ document.addEventListener('pointerup', function(){
 	}
 });
 document.addEventListener('dragstart', function(event){
-	var card = event.target.closest('.wtcb-field-card');
-	var step = event.target.closest('.wtcb-step');
+	var card = event.target.closest('.checkoutly-field-card');
+	var step = event.target.closest('.checkoutly-step');
 	var component = event.target.closest('[data-add-field]');
 	var wooField = event.target.closest('[data-woo-field]');
 	var wooComponent = event.target.closest('[data-woo-component]');
@@ -480,7 +480,7 @@ document.addEventListener('dragstart', function(event){
 		draggedStep = step;
 		step.classList.add('is-step-dragging');
 		event.dataTransfer.effectAllowed = 'move';
-		event.dataTransfer.setData('text/plain', 'wtcb-step');
+		event.dataTransfer.setData('text/plain', 'checkoutly-step');
 		return;
 	}
 
@@ -492,21 +492,21 @@ document.addEventListener('dragstart', function(event){
 	if (component) {
 		paletteField = customField(component.dataset.addField, component.textContent.trim());
 		event.dataTransfer.effectAllowed = 'copy';
-		event.dataTransfer.setData('text/plain', 'wtcb-palette-field');
+		event.dataTransfer.setData('text/plain', 'checkoutly-palette-field');
 		return;
 	}
 
 	if (wooField) {
 		paletteField = nativeField(wooField.dataset.section, wooField.dataset.wooField, wooField.textContent.trim(), wooField.dataset.required === '1');
 		event.dataTransfer.effectAllowed = 'copy';
-		event.dataTransfer.setData('text/plain', 'wtcb-woo-field');
+		event.dataTransfer.setData('text/plain', 'checkoutly-woo-field');
 		return;
 	}
 
 	if (wooComponent) {
 		paletteField = componentField(wooComponent.dataset.wooComponent, wooComponent.textContent.trim());
 		event.dataTransfer.effectAllowed = 'copy';
-		event.dataTransfer.setData('text/plain', 'wtcb-woo-component');
+		event.dataTransfer.setData('text/plain', 'checkoutly-woo-component');
 		return;
 	}
 
@@ -518,7 +518,7 @@ document.addEventListener('dragstart', function(event){
 		dragged = card;
 		card.classList.add('is-dragging');
 		event.dataTransfer.effectAllowed = 'move';
-		event.dataTransfer.setData('text/plain', 'wtcb-field');
+		event.dataTransfer.setData('text/plain', 'checkoutly-field');
 	}
 });
 document.addEventListener('dragend', function(){
@@ -535,7 +535,7 @@ document.addEventListener('dragend', function(){
 });
 document.addEventListener('dragover', function(event){
 	var list = event.target.closest('[data-step-fields]');
-	var stepContainer = event.target.closest('#wtcb-steps');
+	var stepContainer = event.target.closest('#checkoutly-steps');
 
 	if (draggedStep && stepContainer) {
 		event.preventDefault();
@@ -557,7 +557,7 @@ document.addEventListener('dragover', function(event){
 });
 document.addEventListener('drop', function(event){
 	var list = event.target.closest('[data-step-fields]');
-	var stepContainer = event.target.closest('#wtcb-steps');
+	var stepContainer = event.target.closest('#checkoutly-steps');
 
 	if (draggedStep && stepContainer) {
 		event.preventDefault();
@@ -590,20 +590,20 @@ document.addEventListener('drop', function(event){
 	}
 });
 document.addEventListener('click', function(event){
-	var card = event.target.closest('.wtcb-field-card');
+	var card = event.target.closest('.checkoutly-field-card');
 	var segmentButton = event.target.closest('[data-setting-segment] button[data-value]');
-	var topTab = event.target.closest('[data-wtcb-tab]');
+	var topTab = event.target.closest('[data-checkoutly-tab]');
 
 	if (topTab) {
 		event.preventDefault();
-		Array.prototype.forEach.call(document.querySelectorAll('[data-wtcb-tab]'), function(tab){
+		Array.prototype.forEach.call(document.querySelectorAll('[data-checkoutly-tab]'), function(tab){
 			tab.classList.toggle('is-active', tab === topTab);
 		});
 		if (builderView) {
-			builderView.hidden = topTab.dataset.wtcbTab !== 'builder';
+			builderView.hidden = topTab.dataset.checkoutlyTab !== 'builder';
 		}
 		if (globalSettings) {
-			globalSettings.hidden = topTab.dataset.wtcbTab !== 'settings';
+			globalSettings.hidden = topTab.dataset.checkoutlyTab !== 'settings';
 		}
 	}
 	if (segmentButton) {
@@ -614,25 +614,25 @@ document.addEventListener('click', function(event){
 		serialize();
 	}
 	if (event.target.matches('[data-step-count-decrease]')) {
-		setStepCount(steps.querySelectorAll('.wtcb-step').length - 1);
+		setStepCount(steps.querySelectorAll('.checkoutly-step').length - 1);
 	}
-	if (event.target.matches('[data-step-count-increase], #wtcb-add-step')) {
-		setStepCount(steps.querySelectorAll('.wtcb-step').length + 1);
+	if (event.target.matches('[data-step-count-increase], #checkoutly-add-step')) {
+		setStepCount(steps.querySelectorAll('.checkoutly-step').length + 1);
 	}
-	if (event.target.matches('.wtcb-collapse')) {
-		var currentStep = event.target.closest('.wtcb-step');
+	if (event.target.matches('.checkoutly-collapse')) {
+		var currentStep = event.target.closest('.checkoutly-step');
 		var collapsed = currentStep.classList.toggle('is-collapsed');
 		event.target.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
 		event.target.title = collapsed ? 'Expand step' : 'Collapse step';
 	}
-	if (event.target.matches('.wtcb-delete-step')) {
+	if (event.target.matches('.checkoutly-delete-step')) {
 		removeSelectedStep();
 	}
 	if (event.target.matches('[data-open-field-settings]') && card) {
 		var field = parseField(card);
 		var display = displayOptions(field);
-		var currentStep = card.closest('.wtcb-step');
-		var currentStepIndex = Array.prototype.indexOf.call(steps.querySelectorAll('.wtcb-step'), currentStep);
+		var currentStep = card.closest('.checkoutly-step');
+		var currentStepIndex = Array.prototype.indexOf.call(steps.querySelectorAll('.checkoutly-step'), currentStep);
 		activeCard = card;
 		modalTitle.textContent = 'Edit: ' + (field.label || field.key || 'Field');
 		modalFieldType.value = field.fieldType || 'text';
@@ -659,7 +659,7 @@ document.addEventListener('click', function(event){
 		modal.hidden = true;
 		activeCard = null;
 	}
-	if (event.target.matches('#wtcb-open-multistep-settings')) {
+	if (event.target.matches('#checkoutly-open-multistep-settings')) {
 		multiStepModal.hidden = false;
 	}
 	if (event.target.matches('[data-close-multistep-settings]')) {
@@ -670,22 +670,22 @@ document.addEventListener('click', function(event){
 			return;
 		}
 		addOptionRow('');
-		var rows = modalOptions.querySelectorAll('.wtcb-option-value');
+		var rows = modalOptions.querySelectorAll('.checkoutly-option-value');
 		if (rows.length) {
 			rows[rows.length - 1].focus();
 		}
 	}
 	if (event.target.matches('[data-edit-option]')) {
-		var optionInput = event.target.closest('.wtcb-option-row').querySelector('.wtcb-option-value');
+		var optionInput = event.target.closest('.checkoutly-option-row').querySelector('.checkoutly-option-value');
 		if (optionInput) {
 			optionInput.focus();
 			optionInput.select();
 		}
 	}
 	if (event.target.matches('[data-remove-option]')) {
-		event.target.closest('.wtcb-option-row').remove();
+		event.target.closest('.checkoutly-option-row').remove();
 	}
-	if (event.target.matches('#wtcb-apply-field-settings') && activeCard) {
+	if (event.target.matches('#checkoutly-apply-field-settings') && activeCard) {
 		var next = parseField(activeCard);
 		next.label = modalLabel.value.trim() || next.label || next.key;
 		if (next.type === 'custom') {
@@ -706,7 +706,7 @@ document.addEventListener('click', function(event){
 		};
 		setField(activeCard, next);
 		if (modalStep) {
-			var targetStep = steps.querySelectorAll('.wtcb-step')[Number(modalStep.value) || 0];
+			var targetStep = steps.querySelectorAll('.checkoutly-step')[Number(modalStep.value) || 0];
 			var targetList = targetStep ? targetStep.querySelector('[data-step-fields]') : null;
 			if (targetList && activeCard.parentNode !== targetList) {
 				targetList.appendChild(activeCard);
@@ -720,7 +720,7 @@ document.addEventListener('click', function(event){
 		var field = parseField(card);
 		if (field.type === 'custom') {
 			var copy = JSON.parse(JSON.stringify(field));
-			copy.key = 'wtcb_' + copy.fieldType + '_' + Date.now();
+			copy.key = 'checkoutly_' + copy.fieldType + '_' + Date.now();
 			copy.id = copy.key;
 			copy.label = (copy.label || 'Field') + ' copy';
 			card.parentNode.insertBefore(fieldCard(copy), card.nextSibling);
@@ -767,7 +767,7 @@ document.addEventListener('click', function(event){
 	}
 });
 document.addEventListener('change', function(event){
-	if (event.target.matches('.wtcb-field-select')) {
+	if (event.target.matches('.checkoutly-field-select')) {
 		refreshBulkActions();
 	}
 });
@@ -828,7 +828,7 @@ if (form) {
 		serialize();
 
 		formData = new FormData(form);
-		formData.set('action', 'wtcb_save_builder');
+		formData.set('action', 'checkoutly_save_builder');
 		originalText = saveButton ? saveButton.textContent : '';
 
 		if (saveButton) {
@@ -846,7 +846,7 @@ if (form) {
 			if (!payload || !payload.success) {
 				throw new Error(payload && payload.data && payload.data.message ? payload.data.message : 'Unable to save checkout builder.');
 			}
-			showSaveNotice('success', payload.data && payload.data.message ? payload.data.message : 'WooTale checkout builder saved.');
+			showSaveNotice('success', payload.data && payload.data.message ? payload.data.message : 'Checkoutly checkout builder saved.');
 		}).catch(function(error){
 			showSaveNotice('error', error.message || 'Unable to save checkout builder.');
 		}).finally(function(){
@@ -869,7 +869,7 @@ multiStepModal.addEventListener('click', function(event){
 	}
 });
 document.addEventListener('input', function(event){
-	if (event.target.matches('.wtcb-step-title')) {
+	if (event.target.matches('.checkoutly-step-title')) {
 		updateStepSettingsOptions();
 		if (!modal.hidden) {
 			updateModalStepOptions(modalStep ? Number(modalStep.value) || 0 : 0);
@@ -884,20 +884,20 @@ refreshBulkActions();
 updateStepSettingsOptions();
 serialize();
 
-var componentSearch = document.querySelector('.wtcb-components .wtcb-search');
-var componentPanel = document.querySelector('.wtcb-components');
+var componentSearch = document.querySelector('.checkoutly-components .checkoutly-search');
+var componentPanel = document.querySelector('.checkoutly-components');
 
 if (componentSearch && componentPanel) {
 	componentSearch.addEventListener('input', function() {
 		var term = this.value.trim().toLowerCase();
-		var groups = componentPanel.querySelectorAll('h4.wtcb-component-group-title');
-		var grids = componentPanel.querySelectorAll('.wtcb-component-grid');
-		var details = componentPanel.querySelectorAll('details.wtcb-component-accordion');
+		var groups = componentPanel.querySelectorAll('h4.checkoutly-component-group-title');
+		var grids = componentPanel.querySelectorAll('.checkoutly-component-grid');
+		var details = componentPanel.querySelectorAll('details.checkoutly-component-accordion');
 		var advancedHeading = componentPanel.querySelector('h3');
-		var advancedGrid = componentPanel.querySelector('.wtcb-component-grid.is-disabled');
+		var advancedGrid = componentPanel.querySelector('.checkoutly-component-grid.is-disabled');
 
 		if (!term) {
-			componentPanel.querySelectorAll('.wtcb-component').forEach(function(btn) {
+			componentPanel.querySelectorAll('.checkoutly-component').forEach(function(btn) {
 				btn.style.display = '';
 			});
 			groups.forEach(function(g) { g.style.display = ''; });
@@ -907,13 +907,13 @@ if (componentSearch && componentPanel) {
 			return;
 		}
 
-		componentPanel.querySelectorAll('.wtcb-component').forEach(function(btn) {
+		componentPanel.querySelectorAll('.checkoutly-component').forEach(function(btn) {
 			var text = btn.textContent.trim().toLowerCase();
 			btn.style.display = text.indexOf(term) < 0 ? 'none' : '';
 		});
 
 		if (advancedHeading && advancedGrid) {
-			var hasVisibleAdvanced = Array.prototype.some.call(advancedGrid.querySelectorAll('.wtcb-component'), function(btn) {
+			var hasVisibleAdvanced = Array.prototype.some.call(advancedGrid.querySelectorAll('.checkoutly-component'), function(btn) {
 				return btn.style.display !== 'none';
 			});
 			advancedHeading.style.display = hasVisibleAdvanced ? '' : 'none';
@@ -921,9 +921,9 @@ if (componentSearch && componentPanel) {
 		}
 
 		var visibleGrids = new Set();
-		componentPanel.querySelectorAll('.wtcb-component').forEach(function(btn) {
+		componentPanel.querySelectorAll('.checkoutly-component').forEach(function(btn) {
 			if (btn.style.display !== 'none') {
-				var grid = btn.closest('.wtcb-component-grid');
+				var grid = btn.closest('.checkoutly-component-grid');
 				if (grid) { visibleGrids.add(grid); }
 			}
 		});
@@ -938,15 +938,15 @@ if (componentSearch && componentPanel) {
 		groups.forEach(function(title) {
 			var next = title.nextElementSibling;
 			var hasVisible = false;
-			if (next && next.classList && next.classList.contains('wtcb-component-grid')) {
+			if (next && next.classList && next.classList.contains('checkoutly-component-grid')) {
 				hasVisible = next.style.display !== 'none';
 			}
 			title.style.display = hasVisible ? '' : 'none';
 		});
 
 		details.forEach(function(detail) {
-			var hasVisible = detail.querySelector('.wtcb-component-grid:not([style*="display: none"]) .wtcb-component:not([style*="display: none"])') ||
-				detail.querySelector('.wtcb-component[style=""], .wtcb-component:not([style])');
+			var hasVisible = detail.querySelector('.checkoutly-component-grid:not([style*="display: none"]) .checkoutly-component:not([style*="display: none"])') ||
+				detail.querySelector('.checkoutly-component[style=""], .checkoutly-component:not([style])');
 			detail.style.display = hasVisible ? '' : 'none';
 		});
 	});

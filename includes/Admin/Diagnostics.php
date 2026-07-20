@@ -2,14 +2,14 @@
 /**
  * Admin diagnostics screen.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Admin;
+namespace Checkoutly\CheckoutBuilder\Admin;
 
-use WooTale\CheckoutBuilder\Compatibility\WooCommerce;
+use Checkoutly\CheckoutBuilder\Compatibility\WooCommerce;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -46,10 +46,10 @@ final class Diagnostics {
 	public function register_menu(): void {
 		add_submenu_page(
 			'tools.php',
-			__( 'WooTale Checkout Builder Diagnostics', 'wootale-checkout-builder' ),
-			__( 'WooTale Diagnostics', 'wootale-checkout-builder' ),
+			__( 'Checkoutly Checkout Builder Diagnostics', 'checkoutly' ),
+			__( 'Checkoutly Diagnostics', 'checkoutly' ),
 			'manage_options',
-			'wtcb-diagnostics',
+			'checkoutly-diagnostics',
 			array( $this, 'render' )
 		);
 	}
@@ -59,13 +59,13 @@ final class Diagnostics {
 	 */
 	public function render(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Sorry, you are not allowed to access this page.', 'wootale-checkout-builder' ) );
+			wp_die( esc_html__( 'Sorry, you are not allowed to access this page.', 'checkoutly' ) );
 		}
 
 		$rows = $this->get_rows();
 
 		echo '<div class="wrap">';
-		echo '<h1>' . esc_html__( 'WooTale Checkout Builder Diagnostics', 'wootale-checkout-builder' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Checkoutly Checkout Builder Diagnostics', 'checkoutly' ) . '</h1>';
 		echo '<table class="widefat striped"><tbody>';
 
 		foreach ( $rows as $label => $value ) {
@@ -89,7 +89,7 @@ final class Diagnostics {
 		global $wp_version;
 
 		return array(
-			'Plugin version'                 => WTCB_VERSION,
+			'Plugin version'                 => CHECKOUTLY_VERSION,
 			'WordPress version'              => isset( $wp_version ) ? (string) $wp_version : '',
 			'PHP version'                    => PHP_VERSION,
 			'WooCommerce active'             => $this->woocommerce->is_active() ? 'yes' : 'no',

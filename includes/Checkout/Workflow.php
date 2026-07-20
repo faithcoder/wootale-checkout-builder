@@ -2,22 +2,22 @@
 /**
  * Classic checkout workflow configuration.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Checkout;
+namespace Checkoutly\CheckoutBuilder\Checkout;
 
-use WooTale\CheckoutBuilder\Support\Sanitizer;
+use Checkoutly\CheckoutBuilder\Support\Sanitizer;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Stores and sanitizes WooTale classic checkout builder configuration.
+ * Stores and sanitizes Checkoutly classic checkout builder configuration.
  */
 class Workflow {
-	public const OPTION = 'wtcb_classic_checkout_workflow';
+	public const OPTION = 'checkoutly_classic_checkout_workflow';
 	public const MAX_FREE_STEPS = 3;
 
 	/**
@@ -78,52 +78,52 @@ class Workflow {
 			'rememberStep'   => false,
 			'steps'         => array(
 				array(
-					'id'          => 'wtcb_step_customer_details',
-					'title'       => __( 'Customer Details', 'wootale-checkout-builder' ),
-					'description' => __( 'Collect customer, billing, and shipping information.', 'wootale-checkout-builder' ),
+					'id'          => 'checkoutly_step_customer_details',
+					'title'       => __( 'Customer Details', 'checkoutly' ),
+					'description' => __( 'Collect customer, billing, and shipping information.', 'checkoutly' ),
 					'color'       => '#2563eb',
 					'style'       => $this->default_step_style( '#2563eb' ),
 					'fields'      => array(
-						$this->native_field( 'billing', 'billing_first_name', __( 'First name', 'wootale-checkout-builder' ), true, 1 ),
-						$this->native_field( 'billing', 'billing_last_name', __( 'Last name', 'wootale-checkout-builder' ), true, 1 ),
-						$this->native_field( 'billing', 'billing_email', __( 'Email address', 'wootale-checkout-builder' ), true, 1 ),
-						$this->native_field( 'billing', 'billing_phone', __( 'Phone', 'wootale-checkout-builder' ), false ),
-						$this->native_field( 'billing', 'billing_company', __( 'Company name', 'wootale-checkout-builder' ), false ),
-						$this->native_field( 'billing', 'billing_country', __( 'Billing country / region', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'billing', 'billing_address_1', __( 'Billing street address', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'billing', 'billing_address_2', __( 'Billing apartment, suite, unit, etc.', 'wootale-checkout-builder' ), false ),
-						$this->native_field( 'billing', 'billing_city', __( 'Billing town / city', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'billing', 'billing_state', __( 'Billing state / county', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'billing', 'billing_postcode', __( 'Billing postcode / ZIP', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'shipping', 'shipping_first_name', __( 'Shipping first name', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'shipping', 'shipping_last_name', __( 'Shipping last name', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'shipping', 'shipping_company', __( 'Shipping company', 'wootale-checkout-builder' ), false ),
-						$this->native_field( 'shipping', 'shipping_country', __( 'Shipping country / region', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'shipping', 'shipping_address_1', __( 'Shipping street address', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'shipping', 'shipping_address_2', __( 'Shipping apartment, suite, unit, etc.', 'wootale-checkout-builder' ), false ),
-						$this->native_field( 'shipping', 'shipping_city', __( 'Shipping town / city', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'shipping', 'shipping_state', __( 'Shipping state / county', 'wootale-checkout-builder' ), true ),
-						$this->native_field( 'shipping', 'shipping_postcode', __( 'Shipping postcode / ZIP', 'wootale-checkout-builder' ), true ),
+						$this->native_field( 'billing', 'billing_first_name', __( 'First name', 'checkoutly' ), true, 1 ),
+						$this->native_field( 'billing', 'billing_last_name', __( 'Last name', 'checkoutly' ), true, 1 ),
+						$this->native_field( 'billing', 'billing_email', __( 'Email address', 'checkoutly' ), true, 1 ),
+						$this->native_field( 'billing', 'billing_phone', __( 'Phone', 'checkoutly' ), false ),
+						$this->native_field( 'billing', 'billing_company', __( 'Company name', 'checkoutly' ), false ),
+						$this->native_field( 'billing', 'billing_country', __( 'Billing country / region', 'checkoutly' ), true ),
+						$this->native_field( 'billing', 'billing_address_1', __( 'Billing street address', 'checkoutly' ), true ),
+						$this->native_field( 'billing', 'billing_address_2', __( 'Billing apartment, suite, unit, etc.', 'checkoutly' ), false ),
+						$this->native_field( 'billing', 'billing_city', __( 'Billing town / city', 'checkoutly' ), true ),
+						$this->native_field( 'billing', 'billing_state', __( 'Billing state / county', 'checkoutly' ), true ),
+						$this->native_field( 'billing', 'billing_postcode', __( 'Billing postcode / ZIP', 'checkoutly' ), true ),
+						$this->native_field( 'shipping', 'shipping_first_name', __( 'Shipping first name', 'checkoutly' ), true ),
+						$this->native_field( 'shipping', 'shipping_last_name', __( 'Shipping last name', 'checkoutly' ), true ),
+						$this->native_field( 'shipping', 'shipping_company', __( 'Shipping company', 'checkoutly' ), false ),
+						$this->native_field( 'shipping', 'shipping_country', __( 'Shipping country / region', 'checkoutly' ), true ),
+						$this->native_field( 'shipping', 'shipping_address_1', __( 'Shipping street address', 'checkoutly' ), true ),
+						$this->native_field( 'shipping', 'shipping_address_2', __( 'Shipping apartment, suite, unit, etc.', 'checkoutly' ), false ),
+						$this->native_field( 'shipping', 'shipping_city', __( 'Shipping town / city', 'checkoutly' ), true ),
+						$this->native_field( 'shipping', 'shipping_state', __( 'Shipping state / county', 'checkoutly' ), true ),
+						$this->native_field( 'shipping', 'shipping_postcode', __( 'Shipping postcode / ZIP', 'checkoutly' ), true ),
 					),
 				),
 				array(
-					'id'          => 'wtcb_step_shipping_details',
-					'title'       => __( 'Shipping Details', 'wootale-checkout-builder' ),
-					'description' => __( 'Collect delivery preferences and notes.', 'wootale-checkout-builder' ),
+					'id'          => 'checkoutly_step_shipping_details',
+					'title'       => __( 'Shipping Details', 'checkoutly' ),
+					'description' => __( 'Collect delivery preferences and notes.', 'checkoutly' ),
 					'color'       => '#16a34a',
 					'style'       => $this->default_step_style( '#16a34a' ),
 					'fields'      => array(
-						$this->native_field( 'order', 'order_comments', __( 'Order notes', 'wootale-checkout-builder' ), false ),
+						$this->native_field( 'order', 'order_comments', __( 'Order notes', 'checkoutly' ), false ),
 					),
 				),
 				array(
-					'id'          => 'wtcb_step_payment',
-					'title'       => __( 'Payment', 'wootale-checkout-builder' ),
-					'description' => __( 'Complete payment and place the order.', 'wootale-checkout-builder' ),
+					'id'          => 'checkoutly_step_payment',
+					'title'       => __( 'Payment', 'checkoutly' ),
+					'description' => __( 'Complete payment and place the order.', 'checkoutly' ),
 					'color'       => '#7c3aed',
 					'style'       => $this->default_step_style( '#7c3aed' ),
 					'fields'      => array(
-						$this->component( 'order_payment', __( 'Order & Payment', 'wootale-checkout-builder' ) ),
+						$this->component( 'order_payment', __( 'Order & Payment', 'checkoutly' ) ),
 					),
 				),
 			),
@@ -173,12 +173,16 @@ class Workflow {
 			$id   = isset( $step['id'] ) ? sanitize_key( (string) $step['id'] ) : '';
 
 			if ( '' === $id ) {
-				$id = 'wtcb_step_' . ( $index + 1 );
+				$id = 'checkoutly_step_' . ( $index + 1 );
 			}
 
 			$clean['steps'][] = array(
 				'id'          => $id,
-				'title'       => isset( $step['title'] ) ? sanitize_text_field( (string) $step['title'] ) : sprintf( __( 'Step %d', 'wootale-checkout-builder' ), $index + 1 ),
+				'title'       => isset( $step['title'] ) ? sanitize_text_field( (string) $step['title'] ) : sprintf(
+					/* translators: %d: Step number. */
+					__( 'Step %d', 'checkoutly' ),
+					$index + 1
+				),
 				'description' => isset( $step['description'] ) ? sanitize_text_field( (string) $step['description'] ) : '',
 				'color'       => $this->sanitize_color( isset( $step['color'] ) ? (string) $step['color'] : '#2563eb' ),
 				'style'       => $this->sanitize_step_style( isset( $step['style'] ) && is_array( $step['style'] ) ? $step['style'] : array(), isset( $step['color'] ) ? (string) $step['color'] : '#2563eb' ),

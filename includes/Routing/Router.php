@@ -2,12 +2,12 @@
 /**
  * Routing helpers.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Routing;
+namespace Checkoutly\CheckoutBuilder\Routing;
 
 defined( 'ABSPATH' ) || exit;
 

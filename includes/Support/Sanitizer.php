@@ -2,12 +2,12 @@
 /**
  * Shared sanitization helpers.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Support;
+namespace Checkoutly\CheckoutBuilder\Support;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -16,14 +16,14 @@ defined( 'ABSPATH' ) || exit;
  */
 final class Sanitizer {
 	/**
-	 * Sanitize a WooTale stable ID.
+	 * Sanitize a Checkoutly stable ID.
 	 *
 	 * @param string $value Raw value.
 	 */
 	public static function id( string $value ): string {
 		$value = sanitize_key( $value );
 
-		if ( 1 === preg_match( '/^wtcb_(workflow|step|section|field)_[a-z0-9_]+$/', $value ) ) {
+		if ( 1 === preg_match( '/^checkoutly_(workflow|step|section|field)_[a-z0-9_]+$/', $value ) ) {
 			return $value;
 		}
 

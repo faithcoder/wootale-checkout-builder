@@ -1,8 +1,8 @@
 {
-	"name": "wootale-checkout-builder",
+	"name": "checkoutly",
 	"version": "0.7.2",
 	"private": true,
-	"description": "WooTale classic checkout builder dashboard.",
+	"description": "Checkoutly classic checkout builder dashboard.",
 	"scripts": {
 		"lint:php": "find . -path ./node_modules -prune -o -path ./vendor -prune -o -path ./.git -prune -o -name '*.php' -print -exec php -l {} \\;",
 		"lint:wpcs": "vendor/bin/phpcs",

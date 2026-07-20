@@ -2,7 +2,7 @@
 /**
  * Standalone sanitizer tests.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
@@ -24,11 +24,11 @@ if ( ! function_exists( 'sanitize_key' ) ) {
 
 require_once __DIR__ . '/../../includes/Support/Sanitizer.php';
 
-use WooTale\CheckoutBuilder\Support\Sanitizer;
+use Checkoutly\CheckoutBuilder\Support\Sanitizer;
 
 assert_same(
-	'wtcb_step_checkout_1',
-	Sanitizer::id( 'wtcb_step_checkout_1' ),
+	'checkoutly_step_checkout_1',
+	Sanitizer::id( 'checkoutly_step_checkout_1' ),
 	'Valid step ID is preserved.'
 );
 assert_same(

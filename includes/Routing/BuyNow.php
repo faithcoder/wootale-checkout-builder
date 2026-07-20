@@ -2,12 +2,12 @@
 /**
  * Buy Now routing.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Routing;
+namespace Checkoutly\CheckoutBuilder\Routing;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -49,10 +49,10 @@ final class BuyNow {
 			return;
 		}
 
-		wp_nonce_field( 'wtcb_buy_now', 'wtcb_buy_now_nonce', false );
+		wp_nonce_field( 'checkoutly_buy_now', 'checkoutly_buy_now_nonce', false );
 
 		printf(
-			'<button type="submit" name="wtcb_buy_now" value="1" class="button wtcb-buy-now-button">%s</button>',
+			'<button type="submit" name="checkoutly_buy_now" value="1" class="button checkoutly-buy-now-button">%s</button>',
 			esc_html( $this->settings->buy_now_label() )
 		);
 	}
@@ -63,13 +63,13 @@ final class BuyNow {
 	public function handle_request(): void {
 		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
 
-		if ( 'post' !== $request_method || empty( $_POST['wtcb_buy_now'] ) || empty( $_POST['add-to-cart'] ) || empty( $_POST['wtcb_buy_now_nonce'] ) || ! function_exists( 'wc_get_product' ) || ! function_exists( 'WC' ) ) {
+		if ( 'post' !== $request_method || empty( $_POST['checkoutly_buy_now'] ) || empty( $_POST['add-to-cart'] ) || empty( $_POST['checkoutly_buy_now_nonce'] ) || ! function_exists( 'wc_get_product' ) || ! function_exists( 'WC' ) ) {
 			return;
 		}
 
-		$nonce = sanitize_text_field( wp_unslash( $_POST['wtcb_buy_now_nonce'] ) );
+		$nonce = sanitize_text_field( wp_unslash( $_POST['checkoutly_buy_now_nonce'] ) );
 
-		if ( ! wp_verify_nonce( $nonce, 'wtcb_buy_now' ) ) {
+		if ( ! wp_verify_nonce( $nonce, 'checkoutly_buy_now' ) ) {
 			return;
 		}
 
@@ -80,7 +80,7 @@ final class BuyNow {
 			return;
 		}
 
-		$quantity = isset( $_POST['quantity'] ) ? Router::sanitize_quantity( wp_unslash( $_POST['quantity'] ) ) : 1;
+		$quantity = isset( $_POST['quantity'] ) ? Router::sanitize_quantity( absint( wp_unslash( $_POST['quantity'] ) ) ) : 1;
 
 		if ( WC()->cart ) {
 			WC()->cart->add_to_cart( $product_id, $quantity );

@@ -1,8 +1,8 @@
-# AGENTS.md — WooTale Checkout Builder
+# AGENTS.md — Checkoutly Checkout Builder
 
 ## Project Direction
 
-WooTale Checkout Builder is now a dashboard-style workflow builder for the WooCommerce classic checkout shortcode.
+Checkoutly Checkout Builder is now a dashboard-style workflow builder for the WooCommerce classic checkout shortcode.
 
 The plugin is not based on Gutenberg Checkout Blocks. Do not add block metadata, editor block bundles, Store API checkout extensions, or WooCommerce Checkout Block nesting experiments unless the user explicitly asks to revive that architecture.
 
@@ -18,7 +18,7 @@ WooCommerce remains responsible for cart state, shipping, tax, payment, order cr
 
 ## Active Product Shape
 
-- Admin dashboard under `WooTale Checkout`.
+- Admin dashboard under `Checkoutly Checkout`.
 - Builder canvas with up to three free steps.
 - Default first step includes native contact, billing, and shipping fields.
 - Users can move fields between steps.
@@ -26,7 +26,7 @@ WooCommerce remains responsible for cart state, shipping, tax, payment, order cr
 - Users can disable native fields.
 - Users can drag new basic custom fields into steps.
 - Classic checkout hooks apply field status, required state, ordering, and custom fields.
-- Frontend JavaScript reorganizes the classic shortcode checkout form into WooTale steps.
+- Frontend JavaScript reorganizes the classic shortcode checkout form into Checkoutly steps.
 
 ## Active Runtime Files
 
@@ -36,7 +36,7 @@ WooCommerce remains responsible for cart state, shipping, tax, payment, order cr
 - `includes/Checkout/FieldRegistry.php`
 - `includes/Checkout/Display.php`
 - `includes/Plugin.php`
-- `wootale-checkout-builder.php`
+- `checkoutly.php`
 
 ## Verification
 

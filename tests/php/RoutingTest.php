@@ -2,14 +2,14 @@
 /**
  * Standalone routing tests.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
 define( 'ABSPATH', __DIR__ );
 
-$GLOBALS['wtcb_test_options'] = array();
+$GLOBALS['checkoutly_test_options'] = array();
 
 if ( ! function_exists( 'add_filter' ) ) {
 	function add_filter( string $hook, $callback, int $priority = 10, int $accepted_args = 1 ): void {
@@ -32,7 +32,7 @@ if ( ! function_exists( '__' ) ) {
 
 if ( ! function_exists( 'get_option' ) ) {
 	function get_option( string $option, $default = false ) {
-		return $GLOBALS['wtcb_test_options'][ $option ] ?? $default;
+		return $GLOBALS['checkoutly_test_options'][ $option ] ?? $default;
 	}
 }
 
@@ -46,9 +46,9 @@ require_once __DIR__ . '/../../includes/Routing/Settings.php';
 require_once __DIR__ . '/../../includes/Routing/Router.php';
 require_once __DIR__ . '/../../includes/Routing/SkipCart.php';
 
-use WooTale\CheckoutBuilder\Routing\Router;
-use WooTale\CheckoutBuilder\Routing\Settings;
-use WooTale\CheckoutBuilder\Routing\SkipCart;
+use Checkoutly\CheckoutBuilder\Routing\Router;
+use Checkoutly\CheckoutBuilder\Routing\Settings;
+use Checkoutly\CheckoutBuilder\Routing\SkipCart;
 
 $settings = new Settings();
 
@@ -57,7 +57,7 @@ assert_same( false, $settings->skip_cart_enabled(), 'Skip Cart is disabled by de
 assert_same( false, $settings->buy_now_enabled(), 'Buy Now is disabled by default.' );
 assert_same( 'Buy Now', $settings->buy_now_label(), 'Default Buy Now label is used.' );
 
-$GLOBALS['wtcb_test_options'][ Settings::OPTION_ROUTING_MODE ] = Settings::ROUTING_SKIP_CART;
+$GLOBALS['checkoutly_test_options'][ Settings::OPTION_ROUTING_MODE ] = Settings::ROUTING_SKIP_CART;
 $skip_cart = new SkipCart( $settings );
 
 assert_same( true, $settings->skip_cart_enabled(), 'Skip Cart setting is detected.' );

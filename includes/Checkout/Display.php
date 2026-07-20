@@ -1,13 +1,13 @@
 <?php
 /**
- * Display persisted WooTale field data.
+ * Display persisted Checkoutly field data.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Checkout;
+namespace Checkoutly\CheckoutBuilder\Checkout;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,7 +39,7 @@ final class Display {
 			return;
 		}
 
-		echo '<div class="wtcb-order-fields"><h3>' . esc_html__( 'WooTale Checkout Fields', 'wootale-checkout-builder' ) . '</h3>';
+		echo '<div class="checkoutly-order-fields"><h3>' . esc_html__( 'Checkoutly Checkout Fields', 'checkoutly' ) . '</h3>';
 
 		foreach ( $fields as $field ) {
 			printf(
@@ -58,7 +58,7 @@ final class Display {
 	 * @param \WC_Order $order Order object.
 	 */
 	public function render_order_details_fields( $order ): void {
-		$this->render_field_table( $order, 'orderDetails', 'wtcb-order-detail-fields' );
+		$this->render_field_table( $order, 'orderDetails', 'checkoutly-order-detail-fields' );
 	}
 
 	/**
@@ -75,7 +75,7 @@ final class Display {
 			return;
 		}
 
-		$this->render_field_table( $order, 'thankYou', 'wtcb-thank-you-fields' );
+		$this->render_field_table( $order, 'thankYou', 'checkoutly-thank-you-fields' );
 	}
 
 	/**
@@ -92,7 +92,7 @@ final class Display {
 			return;
 		}
 
-		echo '<section class="' . esc_attr( $class ) . '"><h2>' . esc_html__( 'Additional information', 'wootale-checkout-builder' ) . '</h2><table class="woocommerce-table shop_table"><tbody>';
+		echo '<section class="' . esc_attr( $class ) . '"><h2>' . esc_html__( 'Additional information', 'checkoutly' ) . '</h2><table class="woocommerce-table shop_table"><tbody>';
 
 		foreach ( $fields as $field ) {
 			printf(
@@ -122,7 +122,7 @@ final class Display {
 		}
 
 		if ( $plain_text ) {
-			echo "\n" . esc_html__( 'Additional information', 'wootale-checkout-builder' ) . "\n";
+			echo "\n" . esc_html__( 'Additional information', 'checkoutly' ) . "\n";
 
 			foreach ( $fields as $field ) {
 				echo esc_html( $field['label'] . ': ' . $field['value'] ) . "\n";
@@ -131,7 +131,7 @@ final class Display {
 			return;
 		}
 
-		echo '<h2>' . esc_html__( 'Additional information', 'wootale-checkout-builder' ) . '</h2><table cellspacing="0" cellpadding="6" style="width:100%;border:1px solid #e5e5e5" border="1"><tbody>';
+		echo '<h2>' . esc_html__( 'Additional information', 'checkoutly' ) . '</h2><table cellspacing="0" cellpadding="6" style="width:100%;border:1px solid #e5e5e5" border="1"><tbody>';
 
 		foreach ( $fields as $field ) {
 			printf(
@@ -145,7 +145,7 @@ final class Display {
 	}
 
 	/**
-	 * Get saved WooTale order fields.
+	 * Get saved Checkoutly order fields.
 	 *
 	 * @param \WC_Order $order Order object.
 	 * @param string|null $location Optional display location.
@@ -158,7 +158,7 @@ final class Display {
 			$data = $meta->get_data();
 			$key  = isset( $data['key'] ) ? (string) $data['key'] : '';
 
-			if ( 0 !== strpos( $key, '_wtcb_' ) || $this->is_private_field_meta( $key ) ) {
+			if ( 0 !== strpos( $key, '_checkoutly_' ) || $this->is_private_field_meta( $key ) ) {
 				continue;
 			}
 
@@ -205,7 +205,7 @@ final class Display {
 	public function export_order_personal_data( array $personal_data, $order ): array {
 		foreach ( $this->get_order_fields( $order ) as $field ) {
 			$personal_data[] = array(
-				'name'  => 'WooTale: ' . $field['label'],
+				'name'  => 'Checkoutly: ' . $field['label'],
 				'value' => $field['value'],
 			);
 		}

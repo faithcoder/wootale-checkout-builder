@@ -2,12 +2,12 @@
 /**
  * WooCommerce dependency checks.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Compatibility;
+namespace Checkoutly\CheckoutBuilder\Compatibility;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -59,8 +59,8 @@ final class WooCommerce {
 		printf(
 			'<div class="notice notice-error"><p>%s</p></div>',
 			esc_html__(
-				'WooTale Checkout Builder requires WooCommerce and the classic checkout shortcode.',
-				'wootale-checkout-builder'
+				'Checkoutly Checkout Builder requires WooCommerce and the classic checkout shortcode.',
+				'checkoutly'
 			)
 		);
 	}

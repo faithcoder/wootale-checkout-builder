@@ -2,7 +2,7 @@
 /**
  * Standalone display tests.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
@@ -43,8 +43,8 @@ if ( ! function_exists( 'esc_attr' ) ) {
 require_once __DIR__ . '/../../includes/Checkout/FieldRegistry.php';
 require_once __DIR__ . '/../../includes/Checkout/Display.php';
 
-use WooTale\CheckoutBuilder\Checkout\Display;
-use WooTale\CheckoutBuilder\Checkout\FieldRegistry;
+use Checkoutly\CheckoutBuilder\Checkout\Display;
+use Checkoutly\CheckoutBuilder\Checkout\FieldRegistry;
 
 $meta_key = FieldRegistry::meta_key( 'delivery_reference' );
 $order    = new FakeOrder(

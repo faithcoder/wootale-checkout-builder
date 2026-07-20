@@ -1,11 +1,11 @@
-.wtcb-admin {
+.checkoutly-admin {
     --blue: #2563eb;
     --line: #dbeafe;
     --ink: #111827;
     --muted: #6b7280;
     max-width: 1660px;
 }
-.wtcb-topbar {
+.checkoutly-topbar {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 10px;
@@ -14,25 +14,25 @@
     margin: 16px 0;
     padding: 16px;
 }
-.wtcb-topbar-main {
+.checkoutly-topbar-main {
     align-items: center;
     display: flex;
     gap: 18px;
     justify-content: space-between;
 }
-.wtcb-brand {
+.checkoutly-brand {
     align-items: center;
     display: flex;
     gap: 12px;
 }
-.wtcb-brand h1 {
+.checkoutly-brand h1 {
     font-size: 22px;
     margin: 0;
 }
-.wtcb-brand span {
+.checkoutly-brand span {
     font-weight: 400;
 }
-.wtcb-logo {
+.checkoutly-logo {
     align-items: center;
     border: 2px solid var(--blue);
     border-radius: 8px;
@@ -44,42 +44,42 @@
     justify-content: center;
     width: 30px;
 }
-.wtcb-tabs {
+.checkoutly-tabs {
     border-top: 1px solid #e5e7eb;
     display: flex;
     flex-wrap: wrap;
     gap: 24px;
     padding-top: 12px;
 }
-.wtcb-tabs a {
+.checkoutly-tabs a {
     color: #4b5563;
     cursor: pointer;
     text-decoration: none;
 }
-.wtcb-tabs .wtcb-tab-disabled {
+.checkoutly-tabs .checkoutly-tab-disabled {
     cursor: default;
 }
-.wtcb-tabs .is-active {
+.checkoutly-tabs .is-active {
     border-bottom: 2px solid var(--blue);
     color: var(--blue);
     padding-bottom: 10px;
 }
-.wtcb-tabs span,
-.wtcb-components h3 span {
+.checkoutly-tabs span,
+.checkoutly-components h3 span {
     background: #eff6ff;
     border-radius: 6px;
     color: #2563eb;
     font-size: 11px;
     padding: 2px 6px;
 }
-.wtcb-actions {
+.checkoutly-actions {
     display: flex;
     gap: 8px;
 }
-.wtcb-global-settings {
+.checkoutly-global-settings {
     margin: 0 0 20px;
 }
-.wtcb-settings-title {
+.checkoutly-settings-title {
     align-items: center;
     border-bottom: 1px dashed #d1d5db;
     display: flex;
@@ -88,89 +88,89 @@
     margin-bottom: 16px;
     padding-bottom: 14px;
 }
-.wtcb-settings-title h2 {
+.checkoutly-settings-title h2 {
     font-size: 20px;
     margin: 0 0 6px;
 }
-.wtcb-settings-title p {
+.checkoutly-settings-title p {
     color: #6b7280;
     margin: 0;
 }
-.wtcb-global-settings__actions {
+.checkoutly-global-settings__actions {
     display: flex;
     gap: 8px;
 }
-.wtcb-settings-list {
+.checkoutly-settings-list {
     display: flex;
     gap: 14px;
     justify-content: space-between;
 }
-.wtcb-check-row {
+.checkoutly-check-row {
     align-items: flex-start !important;
     display: flex !important;
     gap: 14px !important;
     justify-content: flex-start !important;
     margin: 0 !important;
 }
-.wtcb-check-row input {
+.checkoutly-check-row input {
     accent-color: #2563eb;
     height: 24px;
     margin-top: 1px;
     width: 24px;
 }
-.wtcb-check-row span {
+.checkoutly-check-row span {
     display: grid;
     gap: 4px;
 }
-.wtcb-check-row strong {
+.checkoutly-check-row strong {
     font-size: 16px;
 }
-.wtcb-check-row small {
+.checkoutly-check-row small {
     color: #6b7280;
 }
-.wtcb-configure-multistep {
+.checkoutly-configure-multistep {
     justify-self: start;
 }
-.wtcb-multistep-controls {
+.checkoutly-multistep-controls {
     display: grid;
     gap: 16px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.wtcb-control-card {
+.checkoutly-control-card {
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     display: grid;
     gap: 16px;
     padding: 18px;
 }
-.wtcb-control-card h3 {
+.checkoutly-control-card h3 {
     font-size: 14px;
     margin: 0;
 }
-.wtcb-control-card h4 {
+.checkoutly-control-card h4 {
     font-size: 13px;
     margin: 0 0 10px;
 }
-.wtcb-control-card label {
+.checkoutly-control-card label {
     align-items: center;
     display: flex;
     gap: 12px;
     justify-content: space-between;
     margin: 0;
 }
-.wtcb-control-card input[type="range"] {
+.checkoutly-control-card input[type="range"] {
     width: 220px;
 }
-.wtcb-control-buttons,
-.wtcb-control-behavior {
+.checkoutly-control-buttons,
+.checkoutly-control-behavior {
     grid-column: 1/-1;
 }
-.wtcb-choice-cards {
+.checkoutly-choice-cards {
     display: grid;
     gap: 10px;
     grid-template-columns: 1fr 1fr;
 }
-.wtcb-choice-cards button {
+.checkoutly-choice-cards button {
     align-items: center;
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -182,22 +182,22 @@
     min-height: 74px;
     padding: 12px;
 }
-.wtcb-choice-cards .is-active,
-.wtcb-icon-picker .is-active {
+.checkoutly-choice-cards .is-active,
+.checkoutly-icon-picker .is-active {
     border-color: #2563eb;
     box-shadow: 0 0 0 1px #2563eb;
     color: #2563eb;
 }
-.wtcb-mini-icon {
+.checkoutly-mini-icon {
     color: #2563eb;
     font-family: monospace;
     line-height: 1;
 }
-.wtcb-icon-picker {
+.checkoutly-icon-picker {
     display: flex;
     gap: 14px;
 }
-.wtcb-icon-picker button {
+.checkoutly-icon-picker button {
     align-items: center;
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -209,25 +209,25 @@
     justify-content: center;
     width: 48px;
 }
-.wtcb-button-config-grid {
+.checkoutly-button-config-grid {
     display: grid;
     gap: 24px;
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-.wtcb-button-config-grid > div {
+.checkoutly-button-config-grid > div {
     border-right: 1px solid #e5e7eb;
     display: grid;
     gap: 10px;
     padding-right: 20px;
 }
-.wtcb-button-config-grid > div:last-child {
+.checkoutly-button-config-grid > div:last-child {
     border-right: 0;
     padding-right: 0;
 }
-.wtcb-multistep-controls[hidden] {
+.checkoutly-multistep-controls[hidden] {
     display: none;
 }
-.wtcb-switch-row {
+.checkoutly-switch-row {
     align-items: center;
     background: #f9fafb;
     border: 1px solid #f3f4f6;
@@ -238,40 +238,40 @@
     min-width: 340px;
     padding: 12px;
 }
-.wtcb-switch-row > span {
+.checkoutly-switch-row > span {
     display: grid;
     gap: 4px;
 }
-.wtcb-switch-row small {
+.checkoutly-switch-row small {
     color: #6b7280;
     font-weight: 400;
 }
-.wtcb-builder-shell {
+.checkoutly-builder-shell {
     display: grid;
     gap: 20px;
     grid-template-columns: 320px minmax(520px, 1fr) 320px;
 }
-.wtcb-card {
+.checkoutly-card {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
     padding: 16px;
 }
-.wtcb-card h2 {
+.checkoutly-card h2 {
     font-size: 16px;
     margin: 0 0 14px;
 }
-.wtcb-card h3 {
+.checkoutly-card h3 {
     font-size: 13px;
     margin: 18px 0 10px;
 }
-.wtcb-component-accordion {
+.checkoutly-component-accordion {
     border-top: 1px solid #e5e7eb;
     margin-top: 14px;
     padding-top: 12px;
 }
-.wtcb-component-accordion summary {
+.checkoutly-component-accordion summary {
     align-items: center;
     color: #111827;
     cursor: pointer;
@@ -282,10 +282,10 @@
     list-style: none;
     margin-bottom: 10px;
 }
-.wtcb-component-accordion summary::-webkit-details-marker {
+.checkoutly-component-accordion summary::-webkit-details-marker {
     display: none;
 }
-.wtcb-component-accordion summary::after {
+.checkoutly-component-accordion summary::after {
     border-bottom: 2px solid #4b5563;
     border-right: 2px solid #4b5563;
     content: "";
@@ -294,35 +294,35 @@
     transition: transform 0.16s ease;
     width: 7px;
 }
-.wtcb-component-accordion[open] summary::after {
+.checkoutly-component-accordion[open] summary::after {
     transform: rotate(225deg);
 }
-.wtcb-component-group-title {
+.checkoutly-component-group-title {
     color: #6b7280;
     font-size: 11px;
     letter-spacing: 0.02em;
     margin: 14px 0 8px;
     text-transform: uppercase;
 }
-.wtcb-component-accordion summary + .wtcb-component-group-title {
+.checkoutly-component-accordion summary + .checkoutly-component-group-title {
     margin-top: 4px;
 }
-.wtcb-search,
-.wtcb-settings select,
-.wtcb-step input,
-.wtcb-global-settings select {
+.checkoutly-search,
+.checkoutly-settings select,
+.checkoutly-step input,
+.checkoutly-global-settings select {
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     box-sizing: border-box;
     width: 100%;
 }
-.wtcb-component-grid {
+.checkoutly-component-grid {
     display: grid;
     gap: 8px;
     grid-template-columns: 1fr 1fr;
 }
-.wtcb-component-grid button,
-.wtcb-component {
+.checkoutly-component-grid button,
+.checkoutly-component {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
@@ -330,16 +330,16 @@
     padding: 10px;
     text-align: left;
 }
-.wtcb-component-grid.is-disabled button {
+.checkoutly-component-grid.is-disabled button {
     color: #9ca3af;
 }
-.wtcb-hint {
+.checkoutly-hint {
     background: #f9fafb;
     color: #6b7280;
     margin: 16px -16px -16px;
     padding: 12px 16px;
 }
-.wtcb-canvas-head {
+.checkoutly-canvas-head {
     align-items: center;
     border-bottom: 1px solid #e5e7eb;
     display: flex;
@@ -348,37 +348,37 @@
     margin: -16px -16px 16px;
     padding: 16px;
 }
-.wtcb-canvas-head span {
+.checkoutly-canvas-head span {
     background: #dbeafe;
     border-radius: 6px;
     color: #2563eb;
     font-size: 12px;
     padding: 2px 8px;
 }
-.wtcb-bulk-actions {
+.checkoutly-bulk-actions {
     display: flex;
     gap: 8px;
 }
-.wtcb-bulk-actions .button {
+.checkoutly-bulk-actions .button {
     min-height: 34px;
 }
-.wtcb-bulk-actions .wtcb-bulk-remove:not(:disabled) {
+.checkoutly-bulk-actions .checkoutly-bulk-remove:not(:disabled) {
     border-color: #fecaca;
     color: #dc2626;
 }
-.wtcb-step {
-    background: var(--wtcb-step-bg, #fff);
-    border-color: var(--wtcb-step-border-color, var(--step-color));
-    border-radius: var(--wtcb-step-radius, 10px);
-    border-style: var(--wtcb-step-border-style, solid);
-    border-width: var(--wtcb-step-border-width, 2px);
-    margin-bottom: var(--wtcb-step-margin, 14px);
-    padding: var(--wtcb-step-padding, 14px);
+.checkoutly-step {
+    background: var(--checkoutly-step-bg, #fff);
+    border-color: var(--checkoutly-step-border-color, var(--step-color));
+    border-radius: var(--checkoutly-step-radius, 10px);
+    border-style: var(--checkoutly-step-border-style, solid);
+    border-width: var(--checkoutly-step-border-width, 2px);
+    margin-bottom: var(--checkoutly-step-margin, 14px);
+    padding: var(--checkoutly-step-padding, 14px);
 }
-.wtcb-step.is-step-dragging {
+.checkoutly-step.is-step-dragging {
     opacity: 0.45;
 }
-.wtcb-step.is-collapsed .wtcb-field-list {
+.checkoutly-step.is-collapsed .checkoutly-field-list {
     max-height: 0;
     min-height: 0;
     opacity: 0;
@@ -386,14 +386,14 @@
     padding-top: 0;
     pointer-events: none;
 }
-.wtcb-step-head {
+.checkoutly-step-head {
     align-items: center;
     display: grid;
     gap: 12px;
     grid-template-columns: 20px 30px 1fr 32px;
 }
-.wtcb-drag,
-.wtcb-field-handle {
+.checkoutly-drag,
+.checkoutly-field-handle {
     align-items: center;
     color: #9ca3af;
     cursor: grab;
@@ -404,8 +404,8 @@
     width: 20px;
     top: -4px;
 }
-.wtcb-drag:before,
-.wtcb-field-handle:before {
+.checkoutly-drag:before,
+.checkoutly-field-handle:before {
     background: currentColor;
     border-radius: 50%;
     box-shadow:
@@ -416,11 +416,11 @@
     height: 4px;
     width: 4px;
 }
-.wtcb-drag:active,
-.wtcb-field-handle:active {
+.checkoutly-drag:active,
+.checkoutly-field-handle:active {
     cursor: grabbing;
 }
-.wtcb-badge {
+.checkoutly-badge {
     align-items: center;
     background: var(--step-color);
     border-radius: 50%;
@@ -430,18 +430,18 @@
     justify-content: center;
     width: 30px;
 }
-.wtcb-step-title {
+.checkoutly-step-title {
     border: 0 !important;
-    color: var(--wtcb-step-title-color, #111827) !important;
+    color: var(--checkoutly-step-title-color, #111827) !important;
     font-weight: 700;
     padding: 2px !important;
 }
-.wtcb-step-description {
+.checkoutly-step-description {
     border: 0 !important;
     color: #6b7280;
     padding: 2px !important;
 }
-.wtcb-collapse {
+.checkoutly-collapse {
     align-items: center;
     background: transparent !important;
     border: 0 !important;
@@ -455,7 +455,7 @@
     padding: 0 !important;
     width: 28px;
 }
-.wtcb-collapse span {
+.checkoutly-collapse span {
     border-right: 3px solid currentColor;
     border-top: 3px solid currentColor;
     display: block;
@@ -464,18 +464,18 @@
     transition: transform 0.16s ease;
     width: 12px;
 }
-.wtcb-step.is-collapsed .wtcb-collapse span {
+.checkoutly-step.is-collapsed .checkoutly-collapse span {
     transform: rotate(135deg);
 }
-.wtcb-collapse:hover,
-.wtcb-collapse:focus {
+.checkoutly-collapse:hover,
+.checkoutly-collapse:focus {
     color: #2563eb;
     outline: 0;
 }
-.wtcb-collapse:focus-visible {
+.checkoutly-collapse:focus-visible {
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25) !important;
 }
-.wtcb-field-list {
+.checkoutly-field-list {
     align-items: start;
     display: grid;
     gap: 10px;
@@ -490,7 +490,7 @@
         opacity 0.16s ease,
         padding-top 0.16s ease;
 }
-.wtcb-field-card {
+.checkoutly-field-card {
     align-items: center;
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -501,17 +501,17 @@
     min-height: 42px;
     padding: 10px;
 }
-.wtcb-field-card.is-disabled {
+.checkoutly-field-card.is-disabled {
     opacity: 0.5;
 }
-.wtcb-field-card.is-dragging {
+.checkoutly-field-card.is-dragging {
     opacity: 0.35;
 }
-.wtcb-field-card strong {
+.checkoutly-field-card strong {
     line-height: 20px;
     overflow-wrap: anywhere;
 }
-.wtcb-field-select {
+.checkoutly-field-select {
     -webkit-appearance: none !important;
     appearance: none !important;
     background: #fff !important;
@@ -529,14 +529,14 @@
     position: relative;
     width: 20px !important;
 }
-.wtcb-field-select:before {
+.checkoutly-field-select:before {
     content: none !important;
 }
-.wtcb-field-select:checked {
+.checkoutly-field-select:checked {
     background: #2563eb !important;
     border-color: #2563eb !important;
 }
-.wtcb-field-select:checked:after {
+.checkoutly-field-select:checked:after {
     border: solid #fff;
     border-width: 0 2px 2px 0;
     content: "";
@@ -547,7 +547,7 @@
     transform: rotate(45deg);
     width: 5px;
 }
-.wtcb-field-settings-button {
+.checkoutly-field-settings-button {
     align-items: center;
     background: transparent;
     border: 0;
@@ -562,16 +562,16 @@
     padding: 0;
     width: 32px;
 }
-.wtcb-field-settings-button:hover {
+.checkoutly-field-settings-button:hover {
     background: #f3f4f6;
     color: #2563eb;
 }
-.wtcb-field-actions {
+.checkoutly-field-actions {
     align-items: center;
     display: flex;
     gap: 6px;
 }
-.wtcb-icon-button {
+.checkoutly-icon-button {
     align-items: center;
     background: transparent;
     border: 0;
@@ -586,24 +586,24 @@
     padding: 0;
     width: 32px;
 }
-.wtcb-icon-button:hover {
+.checkoutly-icon-button:hover {
     background: #f3f4f6;
 }
-.wtcb-icon-button:disabled {
+.checkoutly-icon-button:disabled {
     background: transparent;
     cursor: not-allowed;
     opacity: 0.3;
 }
-.wtcb-icon-button.wtcb-danger {
+.checkoutly-icon-button.checkoutly-danger {
     color: #dc2626;
 }
-.wtcb-width-1 {
+.checkoutly-width-1 {
     grid-column: span 1;
 }
-.wtcb-width-2 {
+.checkoutly-width-2 {
     grid-column: 1/-1;
 }
-.wtcb-add-step {
+.checkoutly-add-step {
     background: #fff;
     border: 1px dashed #cbd5e1;
     border-radius: 10px;
@@ -612,116 +612,116 @@
     padding: 24px;
     width: 100%;
 }
-.wtcb-add-step small {
+.checkoutly-add-step small {
     color: #6b7280;
 }
-.wtcb-setting-tabs {
+.checkoutly-setting-tabs {
     border-bottom: 1px solid #e5e7eb;
     display: flex;
     gap: 22px;
     margin: 16px -16px;
     padding: 0 16px 10px;
 }
-.wtcb-setting-tabs .is-active {
+.checkoutly-setting-tabs .is-active {
     border-bottom: 2px solid var(--blue);
     color: var(--blue);
 }
-.wtcb-segment {
+.checkoutly-segment {
     display: grid;
     gap: 8px;
     grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
 }
-.wtcb-segment button,
-.wtcb-icons button,
-.wtcb-step-count button {
+.checkoutly-segment button,
+.checkoutly-icons button,
+.checkoutly-step-count button {
     background: #fff;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     padding: 10px;
 }
-.wtcb-segment .is-active,
-.wtcb-icons .is-active {
+.checkoutly-segment .is-active,
+.checkoutly-icons .is-active {
     border-color: #2563eb;
     color: #2563eb;
 }
-.wtcb-icons {
+.checkoutly-icons {
     display: flex;
     gap: 8px;
 }
-.wtcb-settings label,
-.wtcb-global-settings label {
+.checkoutly-settings label,
+.checkoutly-global-settings label {
     display: flex;
     justify-content: space-between;
     margin: 12px 0;
 }
-.wtcb-step-style-controls {
+.checkoutly-step-style-controls {
     display: grid;
     gap: 12px;
     margin-top: 16px;
 }
-.wtcb-step-style-controls label {
+.checkoutly-step-style-controls label {
     align-items: center;
     display: grid;
     gap: 8px;
     grid-template-columns: minmax(0, 1fr) 110px;
     margin: 0;
 }
-.wtcb-step-style-controls input,
-.wtcb-step-style-controls select {
+.checkoutly-step-style-controls input,
+.checkoutly-step-style-controls select {
     min-height: 38px;
     width: 100%;
 }
-.wtcb-step-style-controls input[type="color"] {
+.checkoutly-step-style-controls input[type="color"] {
     padding: 3px;
 }
-.wtcb-settings select,
-.wtcb-global-settings select {
+.checkoutly-settings select,
+.checkoutly-global-settings select {
     min-height: 38px;
 }
-.wtcb-step-count {
+.checkoutly-step-count {
     display: grid;
     gap: 8px;
     grid-template-columns: 42px 1fr 42px;
 }
-.wtcb-step-count input {
+.checkoutly-step-count input {
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     text-align: center;
 }
-.wtcb-small-note {
+.checkoutly-small-note {
     color: #6b7280;
     font-size: 12px;
     margin: 8px 0 0;
 }
-button#wtcb-remove-selected-step {
+button#checkoutly-remove-selected-step {
     border-color: #fecaca !important;
     color: #dc2626 !important;
     margin-top: 16px;
     width: 100%;
 }
 
-.wtcb-stats {
+.checkoutly-stats {
     display: grid;
     gap: 16px;
     grid-template-columns: repeat(4, 1fr);
     margin-top: 20px;
 }
-.wtcb-stats div {
+.checkoutly-stats div {
     border-right: 1px solid #e5e7eb;
     padding: 8px 16px;
 }
-.wtcb-stats div:last-child {
+.checkoutly-stats div:last-child {
     border-right: 0;
 }
-.wtcb-stats strong,
-.wtcb-stats span {
+.checkoutly-stats strong,
+.checkoutly-stats span {
     display: block;
 }
-.wtcb-stats span {
+.checkoutly-stats span {
     color: #4b5563;
     margin-top: 8px;
 }
-.wtcb-modal {
+.checkoutly-modal {
     align-items: center;
     background: rgba(15, 23, 42, 0.45);
     bottom: 0;
@@ -733,10 +733,10 @@ button#wtcb-remove-selected-step {
     top: 0;
     z-index: 100000;
 }
-.wtcb-modal[hidden] {
+.checkoutly-modal[hidden] {
     display: none;
 }
-.wtcb-modal__panel {
+.checkoutly-modal__panel {
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 24px 80px rgba(15, 23, 42, 0.25);
@@ -745,11 +745,11 @@ button#wtcb-remove-selected-step {
     overflow: auto;
     width: min(900px, calc(100vw - 32px));
 }
-.wtcb-modal__panel--settings {
+.checkoutly-modal__panel--settings {
     max-width: 1180px;
 }
-.wtcb-modal__head,
-.wtcb-modal__foot {
+.checkoutly-modal__head,
+.checkoutly-modal__foot {
     align-items: center;
     background: #fff;
     border-bottom: 1px solid #e5e7eb;
@@ -760,7 +760,7 @@ button#wtcb-remove-selected-step {
     top: 0;
     z-index: 1;
 }
-.wtcb-modal__foot {
+.checkoutly-modal__foot {
     border-bottom: 0;
     border-top: 1px solid #e5e7eb;
     bottom: 0;
@@ -768,65 +768,65 @@ button#wtcb-remove-selected-step {
     justify-content: flex-end;
     top: auto;
 }
-.wtcb-modal__head h2 {
+.checkoutly-modal__head h2 {
     font-size: 18px;
     margin: 0;
 }
-.wtcb-modal__body {
+.checkoutly-modal__body {
     display: grid;
     gap: 16px;
     padding: 16px;
 }
-.wtcb-modal-grid {
+.checkoutly-modal-grid {
     display: grid;
     gap: 16px;
     grid-template-columns: 1fr 1fr;
 }
-.wtcb-modal__body label {
+.checkoutly-modal__body label {
     font-weight: 600;
 }
-.wtcb-modal__body input[type="text"],
-.wtcb-modal__body select,
-.wtcb-modal__body textarea {
+.checkoutly-modal__body input[type="text"],
+.checkoutly-modal__body select,
+.checkoutly-modal__body textarea {
     border: 1px solid #d1d5db;
     border-radius: 6px;
     box-sizing: border-box;
     min-height: 40px;
     width: 100%;
 }
-.wtcb-modal__body input[type="range"] {
+.checkoutly-modal__body input[type="range"] {
     padding: 0;
 }
-.wtcb-modal__body textarea {
+.checkoutly-modal__body textarea {
     resize: vertical;
 }
-.wtcb-option-editor {
+.checkoutly-option-editor {
     display: grid;
     gap: 10px;
 }
-.wtcb-option-editor[hidden] {
+.checkoutly-option-editor[hidden] {
     display: none !important;
 }
-.wtcb-option-editor strong {
+.checkoutly-option-editor strong {
     font-weight: 600;
 }
-.wtcb-option-row {
+.checkoutly-option-row {
     align-items: center;
     display: grid;
     gap: 8px;
     grid-template-columns: minmax(0, 1fr) 32px 32px;
 }
-.wtcb-option-row input {
+.checkoutly-option-row input {
     border: 1px solid #d1d5db;
     border-radius: 6px;
     box-sizing: border-box;
     min-height: 40px;
     width: 100%;
 }
-.wtcb-add-option {
+.checkoutly-add-option {
     justify-self: start;
 }
-.wtcb-toggle-row {
+.checkoutly-toggle-row {
     align-items: center;
     background: #f9fafb;
     border: 1px solid #f3f4f6;
@@ -835,21 +835,21 @@ button#wtcb-remove-selected-step {
     justify-content: space-between;
     padding: 14px;
 }
-.wtcb-toggle-row span {
+.checkoutly-toggle-row span {
     display: grid;
     gap: 4px;
 }
-.wtcb-toggle-row small {
+.checkoutly-toggle-row small {
     color: #6b7280;
     font-weight: 400;
 }
-.wtcb-switch input {
+.checkoutly-switch input {
     clip: rect(0, 0, 0, 0);
     height: 1px;
     position: absolute;
     width: 1px;
 }
-.wtcb-switch span {
+.checkoutly-switch span {
     background: #cbd5e1;
     border-radius: 999px;
     display: block;
@@ -857,7 +857,7 @@ button#wtcb-remove-selected-step {
     position: relative;
     width: 44px;
 }
-.wtcb-switch span:before {
+.checkoutly-switch span:before {
     background: #fff;
     border-radius: 50%;
     content: "";
@@ -868,13 +868,13 @@ button#wtcb-remove-selected-step {
     transition: 0.15s;
     width: 18px;
 }
-.wtcb-switch input:checked + span {
+.checkoutly-switch input:checked + span {
     background: #2563eb;
 }
-.wtcb-switch input:checked + span:before {
+.checkoutly-switch input:checked + span:before {
     left: 23px;
 }
-.wtcb-native-lock-note {
+.checkoutly-native-lock-note {
     background: #eff6ff;
     border: 1px solid #bfdbfe;
     border-radius: 6px;
@@ -883,48 +883,48 @@ button#wtcb-remove-selected-step {
     padding: 10px;
 }
 @media (max-width: 1200px) {
-    .wtcb-builder-shell {
+    .checkoutly-builder-shell {
         grid-template-columns: 1fr;
     }
-    .wtcb-topbar-main {
+    .checkoutly-topbar-main {
         align-items: flex-start;
         display: grid;
     }
-    .wtcb-stats,
-    .wtcb-multistep-controls,
-    .wtcb-button-config-grid {
+    .checkoutly-stats,
+    .checkoutly-multistep-controls,
+    .checkoutly-button-config-grid {
         grid-template-columns: 1fr 1fr;
     }
 }
 @media (max-width: 700px) {
-    .wtcb-field-list,
-    .wtcb-modal-grid,
-    .wtcb-multistep-controls,
-    .wtcb-button-config-grid {
+    .checkoutly-field-list,
+    .checkoutly-modal-grid,
+    .checkoutly-multistep-controls,
+    .checkoutly-button-config-grid {
         grid-template-columns: 1fr;
     }
-    .wtcb-width-1,
-    .wtcb-width-2 {
+    .checkoutly-width-1,
+    .checkoutly-width-2 {
         grid-column: 1/-1;
     }
-    .wtcb-settings-title {
+    .checkoutly-settings-title {
         align-items: stretch;
         display: grid;
     }
-    .wtcb-switch-row {
+    .checkoutly-switch-row {
         min-width: 0;
     }
-    .wtcb-button-config-grid > div {
+    .checkoutly-button-config-grid > div {
         border-right: 0;
         border-bottom: 1px solid #e5e7eb;
         padding: 0 0 16px;
     }
-    .wtcb-button-config-grid > div:last-child {
+    .checkoutly-button-config-grid > div:last-child {
         border-bottom: 0;
         padding-bottom: 0;
     }
 }
-input#wtcb-multistep-enabled::before {
+input#checkoutly-multistep-enabled::before {
     position: relative;
     top: 3px;
     left: 3px;

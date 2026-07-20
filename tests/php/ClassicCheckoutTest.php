@@ -2,7 +2,7 @@
 /**
  * Standalone classic checkout tests.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
@@ -60,8 +60,8 @@ require_once __DIR__ . '/../../includes/Checkout/FieldRegistry.php';
 require_once __DIR__ . '/../../includes/Checkout/Workflow.php';
 require_once __DIR__ . '/../../includes/Checkout/ClassicCheckout.php';
 
-use WooTale\CheckoutBuilder\Checkout\ClassicCheckout;
-use WooTale\CheckoutBuilder\Checkout\Workflow;
+use Checkoutly\CheckoutBuilder\Checkout\ClassicCheckout;
+use Checkoutly\CheckoutBuilder\Checkout\Workflow;
 
 $workflow = new class() extends Workflow {
 	public function fields( ?array $workflow = null ): array {
@@ -152,11 +152,11 @@ $fields  = $classic->filter_checkout_fields(
 );
 
 assert_same( false, $fields['billing']['billing_email']['required'], 'Native required state can be changed.' );
-assert_true( in_array( 'wtcb-width-1', $fields['billing']['billing_email']['class'], true ), 'Native field width class is applied.' );
+assert_true( in_array( 'checkoutly-width-1', $fields['billing']['billing_email']['class'], true ), 'Native field width class is applied.' );
 assert_true( ! isset( $fields['billing']['billing_phone'] ), 'Disabled native field is removed.' );
 assert_true( isset( $fields['order']['delivery_reference'] ), 'Custom fields are added to classic checkout.' );
 assert_same( true, $fields['order']['delivery_reference']['required'], 'Custom required state is preserved.' );
-assert_true( in_array( 'wtcb-width-2', $fields['order']['delivery_reference']['class'], true ), 'Custom field width class is applied.' );
+assert_true( in_array( 'checkoutly-width-2', $fields['order']['delivery_reference']['class'], true ), 'Custom field width class is applied.' );
 assert_same( 'checkbox', $fields['order']['gift_wrap']['type'], 'Checkbox field type is registered.' );
 assert_same( 'radio', $fields['order']['delivery_speed']['type'], 'Radio field type is registered.' );
 assert_same( 'Express delivery', $fields['order']['delivery_speed']['options']['express-delivery'], 'Radio option labels are registered.' );
@@ -170,12 +170,12 @@ $classic->save_custom_fields(
 	)
 );
 
-assert_same( 'Leave at door', $order->get_meta( '_wtcb_delivery_reference' ), 'Text field value is saved to order meta.' );
-assert_same( 'No', $order->get_meta( '_wtcb_gift_wrap' ), 'Unchecked checkbox is saved as No.' );
-assert_same( 'Express delivery', $order->get_meta( '_wtcb_delivery_speed' ), 'Radio field value is saved as readable label.' );
-assert_same( 'yes', $order->get_meta( '_wtcb_delivery_speed_display_order_details' ), 'Radio order details display flag is saved.' );
-assert_same( 'yes', $order->get_meta( '_wtcb_delivery_speed_display_emails' ), 'Radio email display flag is saved.' );
-assert_same( 'yes', $order->get_meta( '_wtcb_delivery_speed_display_thank_you' ), 'Radio thank-you display flag is saved.' );
+assert_same( 'Leave at door', $order->get_meta( '_checkoutly_delivery_reference' ), 'Text field value is saved to order meta.' );
+assert_same( 'No', $order->get_meta( '_checkoutly_gift_wrap' ), 'Unchecked checkbox is saved as No.' );
+assert_same( 'Express delivery', $order->get_meta( '_checkoutly_delivery_speed' ), 'Radio field value is saved as readable label.' );
+assert_same( 'yes', $order->get_meta( '_checkoutly_delivery_speed_display_order_details' ), 'Radio order details display flag is saved.' );
+assert_same( 'yes', $order->get_meta( '_checkoutly_delivery_speed_display_emails' ), 'Radio email display flag is saved.' );
+assert_same( 'yes', $order->get_meta( '_checkoutly_delivery_speed_display_thank_you' ), 'Radio thank-you display flag is saved.' );
 
 echo "ClassicCheckoutTest passed.\n";
 

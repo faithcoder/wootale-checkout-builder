@@ -2,12 +2,12 @@
 /**
  * Checkout routing settings.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder\Routing;
+namespace Checkoutly\CheckoutBuilder\Routing;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,9 +15,9 @@ defined( 'ABSPATH' ) || exit;
  * Stores global Free routing options.
  */
 final class Settings {
-	public const OPTION_ROUTING_MODE     = 'wtcb_routing_mode';
-	public const OPTION_BUY_NOW_ENABLED  = 'wtcb_buy_now_enabled';
-	public const OPTION_BUY_NOW_LABEL    = 'wtcb_buy_now_label';
+	public const OPTION_ROUTING_MODE     = 'checkoutly_routing_mode';
+	public const OPTION_BUY_NOW_ENABLED  = 'checkoutly_buy_now_enabled';
+	public const OPTION_BUY_NOW_LABEL    = 'checkoutly_buy_now_label';
 	public const ROUTING_STANDARD        = 'standard';
 	public const ROUTING_SKIP_CART       = 'skip_cart';
 
@@ -36,7 +36,7 @@ final class Settings {
 	 * @return array<string,string>
 	 */
 	public function register_section( array $sections ): array {
-		$sections['wtcb_checkout_routing'] = __( 'WooTale Checkout Routing', 'wootale-checkout-builder' );
+		$sections['checkoutly_checkout_routing'] = __( 'Checkoutly Checkout Routing', 'checkoutly' );
 
 		return $sections;
 	}
@@ -49,43 +49,43 @@ final class Settings {
 	 * @return array<int,array<string,mixed>>
 	 */
 	public function register_settings( array $settings, string $section ): array {
-		if ( 'wtcb_checkout_routing' !== $section ) {
+		if ( 'checkoutly_checkout_routing' !== $section ) {
 			return $settings;
 		}
 
 		return array(
 			array(
-				'title' => __( 'WooTale Checkout Routing', 'wootale-checkout-builder' ),
+				'title' => __( 'Checkoutly Checkout Routing', 'checkoutly' ),
 				'type'  => 'title',
-				'id'    => 'wtcb_checkout_routing_options',
+				'id'    => 'checkoutly_checkout_routing_options',
 			),
 			array(
-				'title'    => __( 'Customer flow', 'wootale-checkout-builder' ),
+				'title'    => __( 'Customer flow', 'checkoutly' ),
 				'id'       => self::OPTION_ROUTING_MODE,
 				'type'     => 'select',
 				'default'  => self::ROUTING_STANDARD,
 				'options'  => array(
-					self::ROUTING_STANDARD  => __( 'Standard: Product > Cart > Checkout', 'wootale-checkout-builder' ),
-					self::ROUTING_SKIP_CART => __( 'Skip Cart: Product > Checkout', 'wootale-checkout-builder' ),
+					self::ROUTING_STANDARD  => __( 'Standard: Product > Cart > Checkout', 'checkoutly' ),
+					self::ROUTING_SKIP_CART => __( 'Skip Cart: Product > Checkout', 'checkoutly' ),
 				),
-				'desc_tip' => __( 'Routes add-to-cart requests to the configured WooCommerce checkout page. Does not replace WooCommerce checkout.', 'wootale-checkout-builder' ),
+				'desc_tip' => __( 'Routes add-to-cart requests to the configured WooCommerce checkout page. Does not replace WooCommerce checkout.', 'checkoutly' ),
 			),
 			array(
-				'title'   => __( 'Buy Now button', 'wootale-checkout-builder' ),
+				'title'   => __( 'Buy Now button', 'checkoutly' ),
 				'id'      => self::OPTION_BUY_NOW_ENABLED,
 				'type'    => 'checkbox',
 				'default' => 'no',
-				'desc'    => __( 'Show a separate Buy Now button on simple product pages.', 'wootale-checkout-builder' ),
+				'desc'    => __( 'Show a separate Buy Now button on simple product pages.', 'checkoutly' ),
 			),
 			array(
-				'title'   => __( 'Buy Now label', 'wootale-checkout-builder' ),
+				'title'   => __( 'Buy Now label', 'checkoutly' ),
 				'id'      => self::OPTION_BUY_NOW_LABEL,
 				'type'    => 'text',
-				'default' => __( 'Buy Now', 'wootale-checkout-builder' ),
+				'default' => __( 'Buy Now', 'checkoutly' ),
 			),
 			array(
 				'type' => 'sectionend',
-				'id'   => 'wtcb_checkout_routing_options',
+				'id'   => 'checkoutly_checkout_routing_options',
 			),
 		);
 	}
@@ -121,8 +121,8 @@ final class Settings {
 	 * Get Buy Now label.
 	 */
 	public function buy_now_label(): string {
-		$label = trim( (string) get_option( self::OPTION_BUY_NOW_LABEL, __( 'Buy Now', 'wootale-checkout-builder' ) ) );
+		$label = trim( (string) get_option( self::OPTION_BUY_NOW_LABEL, __( 'Buy Now', 'checkoutly' ) ) );
 
-		return '' !== $label ? $label : __( 'Buy Now', 'wootale-checkout-builder' );
+		return '' !== $label ? $label : __( 'Buy Now', 'checkoutly' );
 	}
 }

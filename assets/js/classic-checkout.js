@@ -77,28 +77,28 @@ function defaultStepStyle(color) {
 function applyStepPanelStyle(panel, step) {
 	var style = Object.assign(defaultStepStyle(step.color || '#2563eb'), step.style || {});
 
-	panel.style.setProperty('--wtcb-step-title-color', style.titleColor);
-	panel.style.setProperty('--wtcb-step-bg', style.backgroundColor);
-	panel.style.setProperty('--wtcb-step-border-style', style.borderStyle);
-	panel.style.setProperty('--wtcb-step-border-width', Number(style.borderWidth) + 'px');
-	panel.style.setProperty('--wtcb-step-radius', Number(style.borderRadius) + 'px');
-	panel.style.setProperty('--wtcb-step-border-color', style.borderColor);
-	panel.style.setProperty('--wtcb-step-padding', Number(style.padding) + 'px');
-	panel.style.setProperty('--wtcb-step-margin', Number(style.margin) + 'px');
+	panel.style.setProperty('--checkoutly-step-title-color', style.titleColor);
+	panel.style.setProperty('--checkoutly-step-bg', style.backgroundColor);
+	panel.style.setProperty('--checkoutly-step-border-style', style.borderStyle);
+	panel.style.setProperty('--checkoutly-step-border-width', Number(style.borderWidth) + 'px');
+	panel.style.setProperty('--checkoutly-step-radius', Number(style.borderRadius) + 'px');
+	panel.style.setProperty('--checkoutly-step-border-color', style.borderColor);
+	panel.style.setProperty('--checkoutly-step-padding', Number(style.padding) + 'px');
+	panel.style.setProperty('--checkoutly-step-margin', Number(style.margin) + 'px');
 }
 
 function mountCheckoutSteps() {
-	var workflow = window.wtcbClassicWorkflow || {};
+	var workflow = window.checkoutlyClassicWorkflow || {};
 	var form = document.querySelector('form.checkout');
 
-	if (!form || !workflow.steps || form.dataset.wtcbClassicMounted === 'true') {
+	if (!form || !workflow.steps || form.dataset.checkoutlyClassicMounted === 'true') {
 		return;
 	}
 
 	var host = document.createElement('div');
 	var nav = document.createElement('ol');
 	var panels = document.createElement('div');
-	var storageKey = 'wtcb_active_step';
+	var storageKey = 'checkoutly_active_step';
 	var rememberedStep = workflow.rememberStep && window.localStorage ? Number(window.localStorage.getItem(storageKey) || 0) : 0;
 	var state = { active: Math.max(0, rememberedStep), completed: [] };
 	var visibleSteps = (workflow.steps || []).filter(function (step) {
@@ -110,20 +110,20 @@ function mountCheckoutSteps() {
 	navigation = navigation === 'tabs' ? 'line' : navigation;
 	var iconMap = { '1': '1', user: '♙', flag: '⚑', star: '☆', check: '✓' };
 
-	host.className = 'wtcb-classic-checkout wtcb-orientation-' + (workflow.orientation || 'horizontal') + ' wtcb-indicator-' + indicator + ' wtcb-connector-' + (workflow.connector || 'solid') + ' wtcb-navigation-' + navigation + (isMultiStep ? '' : ' is-single-step');
-	host.style.setProperty('--wtcb-active-color', workflow.activeColor || '#2563eb');
-	host.style.setProperty('--wtcb-completed-color', workflow.completedColor || '#16a34a');
-	host.style.setProperty('--wtcb-inactive-color', workflow.inactiveColor || '#6b7280');
-	host.style.setProperty('--wtcb-connector-thickness', (workflow.connectorThickness || 2) + 'px');
-	host.style.setProperty('--wtcb-connector-gap', (workflow.connectorGap || 24) + 'px');
-	host.style.setProperty('--wtcb-previous-button-color', workflow.previousButtonColor || '#1f2937');
-	host.style.setProperty('--wtcb-previous-button-bg', workflow.previousButtonBackground || '#f5f6f7');
-	host.style.setProperty('--wtcb-next-button-color', workflow.nextButtonColor || '#ffffff');
-	host.style.setProperty('--wtcb-next-button-bg', workflow.nextButtonBackground || '#2563eb');
-	host.style.setProperty('--wtcb-continue-button-color', workflow.continueButtonColor || '#ffffff');
-	host.style.setProperty('--wtcb-continue-button-bg', workflow.continueButtonBackground || '#16a34a');
-	nav.className = 'wtcb-classic-steps';
-	panels.className = 'wtcb-classic-panels';
+	host.className = 'checkoutly-classic-checkout checkoutly-orientation-' + (workflow.orientation || 'horizontal') + ' checkoutly-indicator-' + indicator + ' checkoutly-connector-' + (workflow.connector || 'solid') + ' checkoutly-navigation-' + navigation + (isMultiStep ? '' : ' is-single-step');
+	host.style.setProperty('--checkoutly-active-color', workflow.activeColor || '#2563eb');
+	host.style.setProperty('--checkoutly-completed-color', workflow.completedColor || '#16a34a');
+	host.style.setProperty('--checkoutly-inactive-color', workflow.inactiveColor || '#6b7280');
+	host.style.setProperty('--checkoutly-connector-thickness', (workflow.connectorThickness || 2) + 'px');
+	host.style.setProperty('--checkoutly-connector-gap', (workflow.connectorGap || 24) + 'px');
+	host.style.setProperty('--checkoutly-previous-button-color', workflow.previousButtonColor || '#1f2937');
+	host.style.setProperty('--checkoutly-previous-button-bg', workflow.previousButtonBackground || '#f5f6f7');
+	host.style.setProperty('--checkoutly-next-button-color', workflow.nextButtonColor || '#ffffff');
+	host.style.setProperty('--checkoutly-next-button-bg', workflow.nextButtonBackground || '#2563eb');
+	host.style.setProperty('--checkoutly-continue-button-color', workflow.continueButtonColor || '#ffffff');
+	host.style.setProperty('--checkoutly-continue-button-bg', workflow.continueButtonBackground || '#16a34a');
+	nav.className = 'checkoutly-classic-steps';
+	panels.className = 'checkoutly-classic-panels';
 	if (isMultiStep) {
 		host.append(nav);
 	}
@@ -142,18 +142,18 @@ function mountCheckoutSteps() {
 			var label = document.createElement('span');
 
 			button.type = 'button';
-			marker.className = 'wtcb-step-marker';
-			label.className = 'wtcb-step-label';
+			marker.className = 'checkoutly-step-marker';
+			label.className = 'checkoutly-step-label';
 			label.textContent = step.title || ('Step ' + (index + 1));
 			button.append(marker, label);
-			button.dataset.wtcbStep = String(index);
+			button.dataset.checkoutlyStep = String(index);
 			item.append(button);
 			nav.append(item);
 		}
 
-		panel.className = 'wtcb-classic-panel';
-		panel.dataset.wtcbStep = String(index);
-		panel.style.setProperty('--wtcb-step-color', step.color || '#2563eb');
+		panel.className = 'checkoutly-classic-panel';
+		panel.dataset.checkoutlyStep = String(index);
+		panel.style.setProperty('--checkoutly-step-color', step.color || '#2563eb');
 		applyStepPanelStyle(panel, step);
 		if (isMultiStep) {
 			heading.textContent = step.title || ('Step ' + (index + 1));
@@ -173,13 +173,13 @@ function mountCheckoutSteps() {
 			}
 
 			elements.forEach(function (element) {
-				if (!element || element.dataset.wtcbMounted === 'true') {
+				if (!element || element.dataset.checkoutlyMounted === 'true') {
 					return;
 				}
 
-				element.classList.remove('form-row-first', 'form-row-last', 'form-row-wide', 'wtcb-width-1', 'wtcb-width-2', 'wtcb-width-3');
-				element.classList.add('wtcb-classic-field', 'wtcb-width-' + (field.width || 2));
-				element.dataset.wtcbMounted = 'true';
+				element.classList.remove('form-row-first', 'form-row-last', 'form-row-wide', 'checkoutly-width-1', 'checkoutly-width-2', 'checkoutly-width-3');
+				element.classList.add('checkoutly-classic-field', 'checkoutly-width-' + (field.width || 2));
+				element.dataset.checkoutlyMounted = 'true';
 				panel.append(element);
 			});
 		});
@@ -194,11 +194,11 @@ function mountCheckoutSteps() {
 	var next = document.createElement('button');
 
 	if (isMultiStep) {
-		actions.className = 'wtcb-classic-actions';
+		actions.className = 'checkoutly-classic-actions';
 		prev.type = 'button';
 		next.type = 'button';
-		prev.className = 'wtcb-prev-button';
-		next.className = 'wtcb-next-button';
+		prev.className = 'checkoutly-prev-button';
+		next.className = 'checkoutly-next-button';
 		prev.textContent = workflow.previousText || 'Previous';
 		next.textContent = workflow.continueText || workflow.nextText || 'Continue';
 		actions.append(prev, next);
@@ -213,7 +213,7 @@ function mountCheckoutSteps() {
 			return;
 		}
 		Array.prototype.forEach.call(nav.querySelectorAll('button'), function (button, index) {
-			var marker = button.querySelector('.wtcb-step-marker');
+			var marker = button.querySelector('.checkoutly-step-marker');
 			var item = button.closest('li');
 			var completed = state.completed.indexOf(index) >= 0;
 
@@ -275,9 +275,9 @@ function mountCheckoutSteps() {
 	}
 
 	nav.addEventListener('click', function (event) {
-		var button = event.target.closest('button[data-wtcb-step]');
+		var button = event.target.closest('button[data-checkoutly-step]');
 		if (button) {
-			var nextIndex = Number(button.dataset.wtcbStep);
+			var nextIndex = Number(button.dataset.checkoutlyStep);
 			if (nextIndex <= state.active || workflow.allowCompletedStepNavigation !== false && state.completed.indexOf(nextIndex) >= 0) {
 				go(nextIndex);
 			}
@@ -286,7 +286,7 @@ function mountCheckoutSteps() {
 	prev.addEventListener('click', function () { go(state.active - 1); });
 	next.addEventListener('click', function () { go(state.active + 1); });
 
-	form.dataset.wtcbClassicMounted = 'true';
+	form.dataset.checkoutlyClassicMounted = 'true';
 	cleanupEmptyNativeSections();
 	render();
 }

@@ -2,13 +2,13 @@
 /**
  * Standalone diagnostics tests.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
 define( 'ABSPATH', __DIR__ );
-define( 'WTCB_VERSION', '0.7.2' );
+define( 'CHECKOUTLY_VERSION', '0.7.2' );
 
 $wp_version = '7.0.2';
 
@@ -27,8 +27,8 @@ if ( ! function_exists( 'add_action' ) ) {
 require_once __DIR__ . '/../../includes/Compatibility/WooCommerce.php';
 require_once __DIR__ . '/../../includes/Admin/Diagnostics.php';
 
-use WooTale\CheckoutBuilder\Admin\Diagnostics;
-use WooTale\CheckoutBuilder\Compatibility\WooCommerce;
+use Checkoutly\CheckoutBuilder\Admin\Diagnostics;
+use Checkoutly\CheckoutBuilder\Compatibility\WooCommerce;
 
 $diagnostics = new Diagnostics( new WooCommerce() );
 $rows        = $diagnostics->get_rows();

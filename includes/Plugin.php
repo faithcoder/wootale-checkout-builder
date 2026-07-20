@@ -2,22 +2,22 @@
 /**
  * Plugin bootstrap.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\\CheckoutBuilder
  */
 
 declare(strict_types=1);
 
-namespace WooTale\CheckoutBuilder;
+namespace Checkoutly\CheckoutBuilder;
 
-use WooTale\CheckoutBuilder\Admin\Diagnostics;
-use WooTale\CheckoutBuilder\Admin\Builder;
-use WooTale\CheckoutBuilder\Checkout\ClassicCheckout;
-use WooTale\CheckoutBuilder\Checkout\Display;
-use WooTale\CheckoutBuilder\Checkout\Workflow;
-use WooTale\CheckoutBuilder\Routing\BuyNow;
-use WooTale\CheckoutBuilder\Routing\Settings;
-use WooTale\CheckoutBuilder\Routing\SkipCart;
-use WooTale\CheckoutBuilder\Compatibility\WooCommerce;
+use Checkoutly\CheckoutBuilder\Admin\Diagnostics;
+use Checkoutly\CheckoutBuilder\Admin\Builder;
+use Checkoutly\CheckoutBuilder\Checkout\ClassicCheckout;
+use Checkoutly\CheckoutBuilder\Checkout\Display;
+use Checkoutly\CheckoutBuilder\Checkout\Workflow;
+use Checkoutly\CheckoutBuilder\Routing\BuyNow;
+use Checkoutly\CheckoutBuilder\Routing\Settings;
+use Checkoutly\CheckoutBuilder\Routing\SkipCart;
+use Checkoutly\CheckoutBuilder\Compatibility\WooCommerce;
 
 defined( 'ABSPATH' ) || exit;
 

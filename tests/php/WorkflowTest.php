@@ -2,7 +2,7 @@
 /**
  * Standalone workflow tests.
  *
- * @package WooTale\CheckoutBuilder
+ * @package Checkoutly\CheckoutBuilder
  */
 
 declare(strict_types=1);
@@ -31,7 +31,7 @@ if ( ! function_exists( '__' ) ) {
 require_once __DIR__ . '/../../includes/Support/Sanitizer.php';
 require_once __DIR__ . '/../../includes/Checkout/Workflow.php';
 
-use WooTale\CheckoutBuilder\Checkout\Workflow;
+use Checkoutly\CheckoutBuilder\Checkout\Workflow;
 
 $workflow = new Workflow();
 $default  = $workflow->defaults();
