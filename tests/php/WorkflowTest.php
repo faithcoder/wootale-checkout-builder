@@ -42,6 +42,7 @@ assert_true( count( $default['steps'][0]['fields'] ) > 10, 'Default first step c
 assert_true( in_array( 'billing_email', array_column( $default['steps'][0]['fields'], 'key' ), true ), 'Billing email is in the first step.' );
 assert_true( in_array( 'shipping_address_1', array_column( $default['steps'][0]['fields'], 'key' ), true ), 'Shipping address is in the first step.' );
 assert_same( 1, $default['steps'][0]['fields'][0]['width'], 'First default field starts as half width.' );
+assert_same( 'order_payment', $default['steps'][2]['fields'][0]['key'], 'Default payment step uses the grouped order and payment component.' );
 assert_true( count( $fields ) >= count( $default['steps'][0]['fields'] ), 'Fields flatten across workflow steps.' );
 
 $sanitized = $workflow->sanitize(

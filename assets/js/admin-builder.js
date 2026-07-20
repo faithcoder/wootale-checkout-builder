@@ -54,6 +54,15 @@ var modalDisplayThankYou = document.getElementById('wtcb-modal-display-thank-you
 var modalLockNote = document.getElementById('wtcb-native-lock-note');
 var saveButton = document.querySelector('.wtcb-actions .button-primary');
 var bulkActions = document.querySelector('.wtcb-bulk-actions');
+var stepSettingsSelect = document.getElementById('wtcb-step-settings-select');
+var stepTitleColor = document.getElementById('wtcb-step-title-color');
+var stepBackgroundColor = document.getElementById('wtcb-step-background-color');
+var stepBorderStyle = document.getElementById('wtcb-step-border-style');
+var stepBorderWidth = document.getElementById('wtcb-step-border-width');
+var stepBorderRadius = document.getElementById('wtcb-step-border-radius');
+var stepBorderColor = document.getElementById('wtcb-step-border-color');
+var stepPadding = document.getElementById('wtcb-step-padding');
+var stepMargin = document.getElementById('wtcb-step-margin');
 
 function parseField(card){ try { return JSON.parse(card.dataset.field || '{}'); } catch(e){ return {}; } }
 function fieldWidth(field){ return [1,2].indexOf(Number(field.width)) >= 0 ? Number(field.width) : 2; }
@@ -89,6 +98,118 @@ function refreshBulkActions(){
 	Array.prototype.forEach.call(bulkActions.querySelectorAll('button'), function(button){
 		button.disabled = !hasSelection;
 	});
+}
+function defaultStepStyle(color){
+	return {
+		titleColor: '#111827',
+		backgroundColor: '#ffffff',
+		borderStyle: 'solid',
+		borderWidth: 2,
+		borderRadius: 10,
+		borderColor: color || '#2563eb',
+		padding: 14,
+		margin: 14
+	};
+}
+function parseStepStyle(step){
+	var color = step ? (getComputedStyle(step).getPropertyValue('--step-color').trim() || '#2563eb') : '#2563eb';
+
+	try {
+		return Object.assign(defaultStepStyle(color), JSON.parse(step.dataset.stepStyle || '{}'));
+	} catch(e) {
+		return defaultStepStyle(color);
+	}
+}
+function applyStepStyle(step, style){
+	if (!step) {
+		return;
+	}
+
+	style = Object.assign(defaultStepStyle(getComputedStyle(step).getPropertyValue('--step-color').trim()), style || {});
+	step.dataset.stepStyle = JSON.stringify(style);
+	step.style.setProperty('--wtcb-step-title-color', style.titleColor);
+	step.style.setProperty('--wtcb-step-bg', style.backgroundColor);
+	step.style.setProperty('--wtcb-step-border-style', style.borderStyle);
+	step.style.setProperty('--wtcb-step-border-width', Number(style.borderWidth) + 'px');
+	step.style.setProperty('--wtcb-step-radius', Number(style.borderRadius) + 'px');
+	step.style.setProperty('--wtcb-step-border-color', style.borderColor);
+	step.style.setProperty('--wtcb-step-padding', Number(style.padding) + 'px');
+	step.style.setProperty('--wtcb-step-margin', Number(style.margin) + 'px');
+}
+function selectedSettingsStep(){
+	var index = stepSettingsSelect ? Number(stepSettingsSelect.value) || 0 : 0;
+	return steps.querySelectorAll('.wtcb-step')[index] || steps.querySelector('.wtcb-step');
+}
+function loadStepSettingsControls(){
+	var step = selectedSettingsStep();
+	var style = step ? parseStepStyle(step) : defaultStepStyle('#2563eb');
+
+	if (!stepSettingsSelect) {
+		return;
+	}
+
+	stepTitleColor.value = style.titleColor;
+	stepBackgroundColor.value = style.backgroundColor;
+	stepBorderStyle.value = style.borderStyle;
+	stepBorderWidth.value = String(style.borderWidth);
+	stepBorderRadius.value = String(style.borderRadius);
+	stepBorderColor.value = style.borderColor;
+	stepPadding.value = String(style.padding);
+	stepMargin.value = String(style.margin);
+}
+function updateStepSettingsOptions(){
+	var selected = stepSettingsSelect ? stepSettingsSelect.value : '0';
+
+	if (!stepSettingsSelect) {
+		return;
+	}
+
+	stepSettingsSelect.innerHTML = '';
+	steps.querySelectorAll('.wtcb-step').forEach(function(step, index){
+		var option = document.createElement('option');
+		var title = step.querySelector('.wtcb-step-title').value || ('Step ' + (index + 1));
+		option.value = String(index);
+		option.textContent = title;
+		stepSettingsSelect.appendChild(option);
+	});
+	stepSettingsSelect.value = Number(selected) < steps.querySelectorAll('.wtcb-step').length ? selected : '0';
+	loadStepSettingsControls();
+}
+function updateSelectedStepStyle(){
+	var step = selectedSettingsStep();
+
+	if (!step) {
+		return;
+	}
+
+	applyStepStyle(step, {
+		titleColor: stepTitleColor.value || '#111827',
+		backgroundColor: stepBackgroundColor.value || '#ffffff',
+		borderStyle: stepBorderStyle.value || 'solid',
+		borderWidth: Number(stepBorderWidth.value) || 0,
+		borderRadius: Number(stepBorderRadius.value) || 0,
+		borderColor: stepBorderColor.value || '#2563eb',
+		padding: Number(stepPadding.value) || 0,
+		margin: Number(stepMargin.value) || 0
+	});
+	serialize();
+}
+function removeSelectedStep(){
+	var step = selectedSettingsStep();
+	var allSteps = steps.querySelectorAll('.wtcb-step');
+	var selectedIndex = stepSettingsSelect ? Number(stepSettingsSelect.value) || 0 : 0;
+
+	if (!step || allSteps.length <= 1) {
+		return;
+	}
+
+	step.remove();
+	renumberSteps();
+	if (stepSettingsSelect) {
+		stepSettingsSelect.value = String(Math.max(0, Math.min(selectedIndex, allSteps.length - 2)));
+	}
+	updateStepSettingsOptions();
+	serialize();
 }
 function fieldCard(field){
 	var card = document.createElement('div');
@@ -159,6 +280,7 @@ function stepCard(index){
 	step.dataset.stepIndex = String(index);
 	step.style.setProperty('--step-color', colors[index] || '#2563eb');
 	step.innerHTML = '<div class="wtcb-step-head"><span class="wtcb-drag" title="Drag step" aria-hidden="true"></span><span class="wtcb-badge">' + (index + 1) + '</span><div><input class="wtcb-step-title" value="Step ' + (index + 1) + '" /><input class="wtcb-step-description" value="" /></div><button type="button" class="wtcb-collapse" aria-expanded="true" title="Collapse step"><span aria-hidden="true"></span></button></div><div class="wtcb-field-list" data-step-fields></div>';
+	applyStepStyle(step, defaultStepStyle(colors[index] || '#2563eb'));
 	return step;
 }
 function setStepCount(nextCount){
@@ -176,6 +298,7 @@ function setStepCount(nextCount){
 	}
 
 	renumberSteps();
+	updateStepSettingsOptions();
 	serialize();
 }
 function fieldDropTarget(list, y){
@@ -237,6 +360,7 @@ function serialize(){
 			title: step.querySelector('.wtcb-step-title').value || ('Step ' + (index + 1)),
 			description: step.querySelector('.wtcb-step-description').value || '',
 			color: getComputedStyle(step).getPropertyValue('--step-color').trim() || '#2563eb',
+			style: parseStepStyle(step),
 			fields: fields
 		});
 	});
@@ -376,6 +500,7 @@ document.addEventListener('drop', function(event){
 		draggedStep.classList.remove('is-step-dragging');
 		draggedStep = null;
 		renumberSteps();
+		updateStepSettingsOptions();
 		serialize();
 		return;
 	}
@@ -437,7 +562,7 @@ document.addEventListener('click', function(event){
 		event.target.title = collapsed ? 'Expand step' : 'Collapse step';
 	}
 	if (event.target.matches('.wtcb-delete-step')) {
-		setStepCount(steps.querySelectorAll('.wtcb-step').length - 1);
+		removeSelectedStep();
 	}
 	if (event.target.matches('[data-open-field-settings]') && card) {
 		var field = parseField(card);
@@ -556,6 +681,15 @@ document.addEventListener('change', function(event){
 		refreshBulkActions();
 	}
 });
+if (stepSettingsSelect) {
+	stepSettingsSelect.addEventListener('change', loadStepSettingsControls);
+}
+[stepTitleColor, stepBackgroundColor, stepBorderStyle, stepBorderWidth, stepBorderRadius, stepBorderColor, stepPadding, stepMargin].forEach(function(control){
+	if (control) {
+		control.addEventListener('input', updateSelectedStepStyle);
+		control.addEventListener('change', updateSelectedStepStyle);
+	}
+});
 if (stepCount) {
 	stepCount.addEventListener('change', function(){ setStepCount(stepCount.value); });
 }
@@ -641,10 +775,16 @@ multiStepModal.addEventListener('click', function(event){
 		multiStepModal.hidden = true;
 	}
 });
-document.addEventListener('input', serialize);
+document.addEventListener('input', function(event){
+	if (event.target.matches('.wtcb-step-title')) {
+		updateStepSettingsOptions();
+	}
+	serialize();
+});
 refreshMultiStepControls();
 refreshNavigationControls();
 refreshRangeOutputs();
 refreshBulkActions();
+updateStepSettingsOptions();
 serialize();
 })();

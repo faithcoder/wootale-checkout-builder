@@ -7,28 +7,46 @@ function ready(callback) {
 	document.addEventListener('DOMContentLoaded', callback);
 }
 
-function fieldElement(field) {
+function fieldElements(field) {
 	if (field.type === 'component') {
+		if (field.key === 'order_payment') {
+			var heading = document.getElementById('order_review_heading');
+			var review = document.querySelector('#order_review');
+			var payment = document.querySelector('#payment');
+			var elements = [];
+
+			if (heading) {
+				heading.style.display = 'none';
+			}
+			if (review) {
+				elements.push(review);
+			}
+			if (payment && (!review || !review.contains(payment))) {
+				elements.push(payment);
+			}
+
+			return elements;
+		}
 		if (field.key === 'order_review') {
 			var orderHeading = document.getElementById('order_review_heading');
 			if (orderHeading) {
 				orderHeading.style.display = 'none';
 			}
-			return document.querySelector('#order_review');
+			return [document.querySelector('#order_review')];
 		}
 		if (field.key === 'payment_methods') {
-			return document.querySelector('#payment .wc_payment_methods');
+			return [document.querySelector('#payment .wc_payment_methods')];
 		}
 		if (field.key === 'terms') {
-			return document.querySelector('#payment .woocommerce-terms-and-conditions-wrapper');
+			return [document.querySelector('#payment .woocommerce-terms-and-conditions-wrapper')];
 		}
 		if (field.key === 'place_order') {
-			return document.querySelector('#payment .place-order');
+			return [document.querySelector('#payment .place-order')];
 		}
-		return null;
+		return [];
 	}
 
-	return document.getElementById(field.key + '_field');
+	return [document.getElementById(field.key + '_field')];
 }
 
 function cleanupEmptyNativeSections() {
@@ -41,6 +59,32 @@ function cleanupEmptyNativeSections() {
 	if (payment && !payment.querySelector('.wc_payment_methods, .woocommerce-terms-and-conditions-wrapper, .place-order')) {
 		payment.style.display = 'none';
 	}
+}
+
+function defaultStepStyle(color) {
+	return {
+		titleColor: '#111827',
+		backgroundColor: '#ffffff',
+		borderStyle: 'solid',
+		borderWidth: 0,
+		borderRadius: 0,
+		borderColor: color || '#2563eb',
+		padding: 0,
+		margin: 14
+	};
+}
+
+function applyStepPanelStyle(panel, step) {
+	var style = Object.assign(defaultStepStyle(step.color || '#2563eb'), step.style || {});
+
+	panel.style.setProperty('--wtcb-step-title-color', style.titleColor);
+	panel.style.setProperty('--wtcb-step-bg', style.backgroundColor);
+	panel.style.setProperty('--wtcb-step-border-style', style.borderStyle);
+	panel.style.setProperty('--wtcb-step-border-width', Number(style.borderWidth) + 'px');
+	panel.style.setProperty('--wtcb-step-radius', Number(style.borderRadius) + 'px');
+	panel.style.setProperty('--wtcb-step-border-color', style.borderColor);
+	panel.style.setProperty('--wtcb-step-padding', Number(style.padding) + 'px');
+	panel.style.setProperty('--wtcb-step-margin', Number(style.margin) + 'px');
 }
 
 function mountCheckoutSteps() {
@@ -110,6 +154,7 @@ function mountCheckoutSteps() {
 		panel.className = 'wtcb-classic-panel';
 		panel.dataset.wtcbStep = String(index);
 		panel.style.setProperty('--wtcb-step-color', step.color || '#2563eb');
+		applyStepPanelStyle(panel, step);
 		if (isMultiStep) {
 			heading.textContent = step.title || ('Step ' + (index + 1));
 			description.textContent = step.description || '';
@@ -121,16 +166,22 @@ function mountCheckoutSteps() {
 				return;
 			}
 
-			var element = fieldElement(field);
+			var elements = fieldElements(field);
 
-			if (!element || element.dataset.wtcbMounted === 'true') {
+			if (!elements.length) {
 				return;
 			}
 
-			element.classList.remove('form-row-first', 'form-row-last', 'form-row-wide', 'wtcb-width-1', 'wtcb-width-2', 'wtcb-width-3');
-			element.classList.add('wtcb-classic-field', 'wtcb-width-' + (field.width || 2));
-			element.dataset.wtcbMounted = 'true';
-			panel.append(element);
+			elements.forEach(function (element) {
+				if (!element || element.dataset.wtcbMounted === 'true') {
+					return;
+				}
+
+				element.classList.remove('form-row-first', 'form-row-last', 'form-row-wide', 'wtcb-width-1', 'wtcb-width-2', 'wtcb-width-3');
+				element.classList.add('wtcb-classic-field', 'wtcb-width-' + (field.width || 2));
+				element.dataset.wtcbMounted = 'true';
+				panel.append(element);
+			});
 		});
 
 		panels.append(panel);

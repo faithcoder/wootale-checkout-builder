@@ -326,11 +326,13 @@
     color: #dc2626;
 }
 .wtcb-step {
-    background: linear-gradient(90deg, rgba(37, 99, 235, 0.05), #fff);
-    border: 2px solid var(--step-color);
-    border-radius: 10px;
-    margin-bottom: 14px;
-    padding: 14px;
+    background: var(--wtcb-step-bg, #fff);
+    border-color: var(--wtcb-step-border-color, var(--step-color));
+    border-radius: var(--wtcb-step-radius, 10px);
+    border-style: var(--wtcb-step-border-style, solid);
+    border-width: var(--wtcb-step-border-width, 2px);
+    margin-bottom: var(--wtcb-step-margin, 14px);
+    padding: var(--wtcb-step-padding, 14px);
 }
 .wtcb-step.is-step-dragging {
     opacity: 0.45;
@@ -389,6 +391,7 @@
 }
 .wtcb-step-title {
     border: 0 !important;
+    color: var(--wtcb-step-title-color, #111827) !important;
     font-weight: 700;
     padding: 2px !important;
 }
@@ -610,6 +613,26 @@
     justify-content: space-between;
     margin: 12px 0;
 }
+.wtcb-step-style-controls {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+.wtcb-step-style-controls label {
+    align-items: center;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) 110px;
+    margin: 0;
+}
+.wtcb-step-style-controls input,
+.wtcb-step-style-controls select {
+    min-height: 38px;
+    width: 100%;
+}
+.wtcb-step-style-controls input[type="color"] {
+    padding: 3px;
+}
 .wtcb-settings select,
 .wtcb-global-settings select {
     min-height: 38px;
@@ -629,12 +652,13 @@
     font-size: 12px;
     margin: 8px 0 0;
 }
-.wtcb-delete-step {
+button#wtcb-remove-selected-step {
     border-color: #fecaca !important;
     color: #dc2626 !important;
     margin-top: 16px;
     width: 100%;
 }
+
 .wtcb-stats {
     display: grid;
     gap: 16px;

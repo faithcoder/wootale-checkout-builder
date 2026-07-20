@@ -82,6 +82,7 @@ class Workflow {
 					'title'       => __( 'Customer Details', 'wootale-checkout-builder' ),
 					'description' => __( 'Collect customer, billing, and shipping information.', 'wootale-checkout-builder' ),
 					'color'       => '#2563eb',
+					'style'       => $this->default_step_style( '#2563eb' ),
 					'fields'      => array(
 						$this->native_field( 'billing', 'billing_first_name', __( 'First name', 'wootale-checkout-builder' ), true, 1 ),
 						$this->native_field( 'billing', 'billing_last_name', __( 'Last name', 'wootale-checkout-builder' ), true, 1 ),
@@ -110,6 +111,7 @@ class Workflow {
 					'title'       => __( 'Shipping Details', 'wootale-checkout-builder' ),
 					'description' => __( 'Collect delivery preferences and notes.', 'wootale-checkout-builder' ),
 					'color'       => '#16a34a',
+					'style'       => $this->default_step_style( '#16a34a' ),
 					'fields'      => array(
 						$this->native_field( 'order', 'order_comments', __( 'Order notes', 'wootale-checkout-builder' ), false ),
 					),
@@ -119,10 +121,9 @@ class Workflow {
 					'title'       => __( 'Payment', 'wootale-checkout-builder' ),
 					'description' => __( 'Complete payment and place the order.', 'wootale-checkout-builder' ),
 					'color'       => '#7c3aed',
+					'style'       => $this->default_step_style( '#7c3aed' ),
 					'fields'      => array(
-						$this->component( 'payment_methods', __( 'Payment Methods', 'wootale-checkout-builder' ) ),
-						$this->component( 'terms', __( 'Terms & Conditions', 'wootale-checkout-builder' ) ),
-						$this->component( 'place_order', __( 'Place Order Button', 'wootale-checkout-builder' ) ),
+						$this->component( 'order_payment', __( 'Order & Payment', 'wootale-checkout-builder' ) ),
 					),
 				),
 			),
@@ -180,6 +181,7 @@ class Workflow {
 				'title'       => isset( $step['title'] ) ? sanitize_text_field( (string) $step['title'] ) : sprintf( __( 'Step %d', 'wootale-checkout-builder' ), $index + 1 ),
 				'description' => isset( $step['description'] ) ? sanitize_text_field( (string) $step['description'] ) : '',
 				'color'       => $this->sanitize_color( isset( $step['color'] ) ? (string) $step['color'] : '#2563eb' ),
+				'style'       => $this->sanitize_step_style( isset( $step['style'] ) && is_array( $step['style'] ) ? $step['style'] : array(), isset( $step['color'] ) ? (string) $step['color'] : '#2563eb' ),
 				'fields'      => $this->sanitize_fields( isset( $step['fields'] ) && is_array( $step['fields'] ) ? $step['fields'] : array() ),
 			);
 		}
@@ -224,6 +226,22 @@ class Workflow {
 			'options'     => '',
 			'validation'  => array(),
 			'display'     => $this->default_display_options(),
+		);
+	}
+
+	/**
+	 * @return array<string,mixed>
+	 */
+	private function default_step_style( string $border_color ): array {
+		return array(
+			'titleColor'      => '#111827',
+			'backgroundColor' => '#ffffff',
+			'borderStyle'     => 'solid',
+			'borderWidth'     => 2,
+			'borderRadius'    => 10,
+			'borderColor'     => $border_color,
+			'padding'         => 14,
+			'margin'          => 14,
 		);
 	}
 
@@ -330,6 +348,23 @@ class Workflow {
 		}
 
 		return 2;
+	}
+
+	/**
+	 * @param array<string,mixed> $style Step style.
+	 * @return array<string,mixed>
+	 */
+	private function sanitize_step_style( array $style, string $fallback_color ): array {
+		return array(
+			'titleColor'      => $this->sanitize_color( isset( $style['titleColor'] ) ? (string) $style['titleColor'] : '#111827' ),
+			'backgroundColor' => $this->sanitize_color( isset( $style['backgroundColor'] ) ? (string) $style['backgroundColor'] : '#ffffff' ),
+			'borderStyle'     => $this->sanitize_choice( isset( $style['borderStyle'] ) ? (string) $style['borderStyle'] : 'solid', array( 'solid', 'dashed', 'dotted', 'none' ), 'solid' ),
+			'borderWidth'     => $this->sanitize_range( isset( $style['borderWidth'] ) ? (int) $style['borderWidth'] : 2, 0, 12, 2 ),
+			'borderRadius'    => $this->sanitize_range( isset( $style['borderRadius'] ) ? (int) $style['borderRadius'] : 10, 0, 40, 10 ),
+			'borderColor'     => $this->sanitize_color( isset( $style['borderColor'] ) ? (string) $style['borderColor'] : $fallback_color ),
+			'padding'         => $this->sanitize_range( isset( $style['padding'] ) ? (int) $style['padding'] : 14, 0, 80, 14 ),
+			'margin'          => $this->sanitize_range( isset( $style['margin'] ) ? (int) $style['margin'] : 14, 0, 80, 14 ),
+		);
 	}
 
 	private function sanitize_range( int $value, int $min, int $max, int $fallback ): int {

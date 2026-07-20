@@ -195,7 +195,7 @@ final class Builder {
 
 	private function render_header( string $checkout_url ): void {
 		echo '<div class="wtcb-topbar">';
-		echo '<div class="wtcb-topbar-main"><div class="wtcb-brand"><span class="wtcb-logo">WT</span><h1><strong>WooTale</strong> <span>Checkout Builder</span></h1></div>';
+		echo '<div class="wtcb-topbar-main"><div class="wtcb-brand"><span class="wtcb-logo">WT</span><h1><strong>WooTale</strong> <span>Multi-Step Checkout Builder</span></h1></div>';
 		echo '<div class="wtcb-actions"><a class="button" href="https://wootale.com/docs" target="_blank" rel="noreferrer">Docs</a><a class="button" href="' . esc_url( $checkout_url ) . '" target="_blank" rel="noreferrer">Preview Checkout</a><button class="button button-primary" type="submit" form="wtcb-builder-form">Save Changes</button></div></div>';
 		echo '<nav class="wtcb-tabs"><a class="is-active" data-wtcb-tab="builder">Classic Builder</a><a class="wtcb-tab-disabled" aria-disabled="true">Block Builder <span>' . esc_html__( 'Coming Soon', 'wootale-checkout-builder' ) . '</span></a><a data-wtcb-tab="settings">Settings</a><a class="wtcb-tab-disabled" aria-disabled="true">Rules <span>' . esc_html__( 'Coming Soon', 'wootale-checkout-builder' ) . '</span></a></nav>';
 		echo '</div>';
@@ -286,10 +286,7 @@ final class Builder {
 			array( 'order', 'order_comments', 'Additional information / Order notes', false ),
 		);
 		$components = array(
-			array( 'order_review', 'Your order' ),
-			array( 'payment_methods', 'Payment Methods' ),
-			array( 'terms', 'Terms & Conditions' ),
-			array( 'place_order', 'Place Order Button' ),
+			array( 'order_payment', 'Order & Payment' ),
 		);
 
 		echo '<aside class="wtcb-card wtcb-components"><h2>Add Components</h2><input class="wtcb-search" type="search" placeholder="Search components..." />';
@@ -333,7 +330,9 @@ final class Builder {
 	 * @param array<string,mixed> $step Step.
 	 */
 	private function render_step( array $step, int $index ): void {
-		echo '<section class="wtcb-step" draggable="true" data-step-index="' . esc_attr( (string) $index ) . '" style="--step-color:' . esc_attr( $step['color'] ) . '">';
+		$style = $this->step_style( $step );
+
+		echo '<section class="wtcb-step" draggable="true" data-step-index="' . esc_attr( (string) $index ) . '" data-step-style="' . esc_attr( $this->encode_json( $style ) ) . '" style="' . esc_attr( $this->step_style_attribute( $step, $style ) ) . '">';
 		echo '<div class="wtcb-step-head"><span class="wtcb-drag" title="' . esc_attr__( 'Drag step', 'wootale-checkout-builder' ) . '" aria-hidden="true"></span><span class="wtcb-badge">' . esc_html( (string) ( $index + 1 ) ) . '</span><div><input class="wtcb-step-title" value="' . esc_attr( $step['title'] ) . '" /><input class="wtcb-step-description" value="' . esc_attr( $step['description'] ) . '" /></div><button type="button" class="wtcb-collapse" aria-expanded="true" title="' . esc_attr__( 'Collapse step', 'wootale-checkout-builder' ) . '"><span aria-hidden="true"></span></button></div>';
 		echo '<div class="wtcb-field-list" data-step-fields>';
 
@@ -414,13 +413,63 @@ final class Builder {
 	 */
 	private function render_settings_panel( array $workflow ): void {
 		$first_step = isset( $workflow['steps'][0] ) ? $workflow['steps'][0] : array();
+		$style      = $this->step_style( $first_step );
 
-		echo '<aside class="wtcb-card wtcb-settings"><h2>Step Settings</h2><select><option>' . esc_html( $first_step['title'] ?? 'Step 1' ) . '</option></select><div class="wtcb-setting-tabs"><a>General</a><a class="is-active">Style</a><a>Advanced</a></div>';
-		echo '<h3>Step Layout</h3><div class="wtcb-segment"><button type="button" class="is-active">Content</button><button type="button">Style</button></div>';
-		echo '<h3>Step Icon</h3><div class="wtcb-icons"><button type="button" class="is-active">1</button><button type="button">◎</button><button type="button">☆</button></div>';
-		echo '<h3>Color Settings</h3><label>Primary Color <input type="color" value="' . esc_attr( $first_step['color'] ?? '#2563eb' ) . '" /></label>';
-		echo '<h3>Step Visibility</h3><div class="wtcb-segment"><button type="button" class="is-active">Always Show</button><button type="button">Conditional Pro</button></div>';
-		echo '<button type="button" class="button wtcb-delete-step">Delete Step</button></aside>';
+		echo '<aside class="wtcb-card wtcb-settings"><h2>' . esc_html__( 'Step Settings', 'wootale-checkout-builder' ) . '</h2><select id="wtcb-step-settings-select">';
+		foreach ( $workflow['steps'] as $index => $step ) {
+			printf( '<option value="%1$s">%2$s</option>', esc_attr( (string) $index ), esc_html( $step['title'] ?? sprintf( __( 'Step %d', 'wootale-checkout-builder' ), $index + 1 ) ) );
+		}
+		echo '</select><div class="wtcb-step-style-controls">';
+		echo '<label>' . esc_html__( 'Step Title Color', 'wootale-checkout-builder' ) . '<input type="color" id="wtcb-step-title-color" value="' . esc_attr( $style['titleColor'] ) . '" /></label>';
+		echo '<label>' . esc_html__( 'Step Background Color', 'wootale-checkout-builder' ) . '<input type="color" id="wtcb-step-background-color" value="' . esc_attr( $style['backgroundColor'] ) . '" /></label>';
+		echo '<label>' . esc_html__( 'Step Border Style', 'wootale-checkout-builder' ) . '<select id="wtcb-step-border-style"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option><option value="none">None</option></select></label>';
+		echo '<label>' . esc_html__( 'Step Border Width', 'wootale-checkout-builder' ) . '<input type="number" id="wtcb-step-border-width" min="0" max="12" value="' . esc_attr( (string) $style['borderWidth'] ) . '" /></label>';
+		echo '<label>' . esc_html__( 'Step Border Radius', 'wootale-checkout-builder' ) . '<input type="number" id="wtcb-step-border-radius" min="0" max="40" value="' . esc_attr( (string) $style['borderRadius'] ) . '" /></label>';
+		echo '<label>' . esc_html__( 'Step Border Color', 'wootale-checkout-builder' ) . '<input type="color" id="wtcb-step-border-color" value="' . esc_attr( $style['borderColor'] ) . '" /></label>';
+		echo '<label>' . esc_html__( 'Step Padding', 'wootale-checkout-builder' ) . '<input type="number" id="wtcb-step-padding" min="0" max="80" value="' . esc_attr( (string) $style['padding'] ) . '" /></label>';
+		echo '<label>' . esc_html__( 'Step Margin', 'wootale-checkout-builder' ) . '<input type="number" id="wtcb-step-margin" min="0" max="80" value="' . esc_attr( (string) $style['margin'] ) . '" /></label>';
+		echo '</div><button type="button" class="button wtcb-delete-step" id="wtcb-remove-selected-step">' . esc_html__( 'Remove Step', 'wootale-checkout-builder' ) . '</button></aside>';
+	}
+
+	/**
+	 * @param array<string,mixed> $step Step.
+	 * @return array<string,mixed>
+	 */
+	private function step_style( array $step ): array {
+		$style = isset( $step['style'] ) && is_array( $step['style'] ) ? $step['style'] : array();
+		$color = isset( $step['color'] ) ? (string) $step['color'] : '#2563eb';
+
+		return array(
+			'titleColor'      => isset( $style['titleColor'] ) ? (string) $style['titleColor'] : '#111827',
+			'backgroundColor' => isset( $style['backgroundColor'] ) ? (string) $style['backgroundColor'] : '#ffffff',
+			'borderStyle'     => isset( $style['borderStyle'] ) ? (string) $style['borderStyle'] : 'solid',
+			'borderWidth'     => isset( $style['borderWidth'] ) ? (int) $style['borderWidth'] : 2,
+			'borderRadius'    => isset( $style['borderRadius'] ) ? (int) $style['borderRadius'] : 10,
+			'borderColor'     => isset( $style['borderColor'] ) ? (string) $style['borderColor'] : $color,
+			'padding'         => isset( $style['padding'] ) ? (int) $style['padding'] : 14,
+			'margin'          => isset( $style['margin'] ) ? (int) $style['margin'] : 14,
+		);
+	}
+
+	/**
+	 * @param array<string,mixed> $step Step.
+	 * @param array<string,mixed> $style Step style.
+	 */
+	private function step_style_attribute( array $step, array $style ): string {
+		$color = isset( $step['color'] ) ? (string) $step['color'] : '#2563eb';
+
+		return sprintf(
+			'--step-color:%1$s;--wtcb-step-title-color:%2$s;--wtcb-step-bg:%3$s;--wtcb-step-border-style:%4$s;--wtcb-step-border-width:%5$dpx;--wtcb-step-radius:%6$dpx;--wtcb-step-border-color:%7$s;--wtcb-step-padding:%8$dpx;--wtcb-step-margin:%9$dpx;',
+			$color,
+			(string) $style['titleColor'],
+			(string) $style['backgroundColor'],
+			(string) $style['borderStyle'],
+			(int) $style['borderWidth'],
+			(int) $style['borderRadius'],
+			(string) $style['borderColor'],
+			(int) $style['padding'],
+			(int) $style['margin']
+		);
 	}
 
 	/**
