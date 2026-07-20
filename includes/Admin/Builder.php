@@ -262,18 +262,22 @@ final class Builder {
 			array( 'radio', 'Radio' ),
 			array( 'checkbox', 'Checkbox' ),
 		);
-		$woo = array(
-			array( 'billing', 'billing_first_name', 'First name', true ),
-			array( 'billing', 'billing_last_name', 'Last name', true ),
-			array( 'billing', 'billing_email', 'Email address', true ),
-			array( 'billing', 'billing_phone', 'Phone', false ),
-			array( 'billing', 'billing_company', 'Company name', false ),
+		$customer = array(
+			array( 'billing', 'billing_first_name', 'First Name', true ),
+			array( 'billing', 'billing_last_name', 'Last Name', true ),
+			array( 'billing', 'billing_email', 'Email', true ),
+			array( 'billing', 'billing_phone', 'Phone Number', false ),
+			array( 'billing', 'billing_company', 'Company', false ),
+		);
+		$billing = array(
 			array( 'billing', 'billing_country', 'Billing country / region', true ),
 			array( 'billing', 'billing_address_1', 'Billing street address', true ),
 			array( 'billing', 'billing_address_2', 'Billing apartment, suite, unit, etc.', false ),
 			array( 'billing', 'billing_city', 'Billing town / city', true ),
 			array( 'billing', 'billing_state', 'Billing state / county', true ),
 			array( 'billing', 'billing_postcode', 'Billing postcode / ZIP', true ),
+		);
+		$shipping = array(
 			array( 'shipping', 'shipping_first_name', 'Shipping first name', true ),
 			array( 'shipping', 'shipping_last_name', 'Shipping last name', true ),
 			array( 'shipping', 'shipping_company', 'Shipping company', false ),
@@ -283,6 +287,8 @@ final class Builder {
 			array( 'shipping', 'shipping_city', 'Shipping town / city', true ),
 			array( 'shipping', 'shipping_state', 'Shipping state / county', true ),
 			array( 'shipping', 'shipping_postcode', 'Shipping postcode / ZIP', true ),
+		);
+		$order = array(
 			array( 'order', 'order_comments', 'Additional information / Order notes', false ),
 		);
 		$components = array(
@@ -290,13 +296,33 @@ final class Builder {
 		);
 
 		echo '<aside class="wtcb-card wtcb-components"><h2>Add Components</h2><input class="wtcb-search" type="search" placeholder="Search components..." />';
-		echo '<h3>Basic Fields</h3><div class="wtcb-component-grid">';
+		echo '<details class="wtcb-component-accordion" open><summary>Basic Fields</summary><div class="wtcb-component-grid">';
 		foreach ( $basic as $item ) {
 			printf( '<button type="button" draggable="true" class="wtcb-component" data-add-field="%s">%s</button>', esc_attr( $item[0] ), esc_html( $item[1] ) );
 		}
-		echo '</div><h3>Advanced Fields <span>Pro</span></h3><div class="wtcb-component-grid is-disabled"><button type="button">Date Picker</button><button type="button">File Upload</button><button type="button">Signature</button><button type="button">Multi Select</button></div>';
-		echo '<h3>WooCommerce Fields</h3><div class="wtcb-component-grid">';
-		foreach ( $woo as $item ) {
+		echo '</div></details><h3>Advanced Fields <span>Pro</span></h3><div class="wtcb-component-grid is-disabled"><button type="button">Date Picker</button><button type="button">File Upload</button><button type="button">Signature</button><button type="button">Multi Select</button></div>';
+		echo '<details class="wtcb-component-accordion" open><summary>WooCommerce Fields</summary>';
+		$this->render_woocommerce_field_group( __( 'Customer Information Fields', 'wootale-checkout-builder' ), $customer );
+		$this->render_woocommerce_field_group( __( 'Billing Fields', 'wootale-checkout-builder' ), $billing );
+		$this->render_woocommerce_field_group( __( 'Shipping Fields', 'wootale-checkout-builder' ), $shipping );
+		$this->render_woocommerce_field_group( __( 'Order Fields', 'wootale-checkout-builder' ), $order );
+		echo '<h4 class="wtcb-component-group-title">' . esc_html__( 'Order & Payment', 'wootale-checkout-builder' ) . '</h4><div class="wtcb-component-grid">';
+		foreach ( $components as $item ) {
+			printf( '<button type="button" draggable="true" class="wtcb-component" data-woo-component="%s">%s</button>', esc_attr( $item[0] ), esc_html( $item[1] ) );
+		}
+		echo '</div></details><p class="wtcb-hint">Drag components to the steps on the canvas.</p></aside>';
+	}
+
+	/**
+	 * Render one grouped set of WooCommerce field palette items.
+	 *
+	 * @param string              $title Group title.
+	 * @param array<int,array{0:string,1:string,2:string,3:bool}> $fields Field data.
+	 */
+	private function render_woocommerce_field_group( string $title, array $fields ): void {
+		echo '<h4 class="wtcb-component-group-title">' . esc_html( $title ) . '</h4><div class="wtcb-component-grid">';
+
+		foreach ( $fields as $item ) {
 			printf(
 				'<button type="button" draggable="true" class="wtcb-component" data-woo-field="%1$s" data-section="%2$s" data-required="%3$s">%4$s</button>',
 				esc_attr( $item[1] ),
@@ -305,11 +331,8 @@ final class Builder {
 				esc_html( $item[2] )
 			);
 		}
-		echo '</div><h3>Checkout Components</h3><div class="wtcb-component-grid">';
-		foreach ( $components as $item ) {
-			printf( '<button type="button" draggable="true" class="wtcb-component" data-woo-component="%s">%s</button>', esc_attr( $item[0] ), esc_html( $item[1] ) );
-		}
-		echo '</div><p class="wtcb-hint">Drag components to the steps on the canvas.</p></aside>';
+
+		echo '</div>';
 	}
 
 	/**
@@ -389,13 +412,13 @@ final class Builder {
 		echo '<div class="wtcb-modal__head"><h2 id="wtcb-field-modal-title">' . esc_html__( 'Edit Field', 'wootale-checkout-builder' ) . '</h2><button type="button" class="wtcb-icon-button" data-close-field-settings>×</button></div>';
 		echo '<div class="wtcb-modal__body">';
 		echo '<div class="wtcb-modal-grid"><label>' . esc_html__( 'Field Type', 'wootale-checkout-builder' ) . '<select id="wtcb-modal-field-type"><option value="text">Text</option><option value="email">Email</option><option value="tel">Phone</option><option value="number">Number</option><option value="textarea">Textarea</option><option value="select">Select</option><option value="radio">Radio</option><option value="checkbox">Checkbox</option><option value="component">Component</option></select></label>';
-		echo '<label>' . esc_html__( 'Section', 'wootale-checkout-builder' ) . '<select id="wtcb-modal-section"><option value="billing">Billing</option><option value="shipping">Shipping</option><option value="order">Order</option><option value="component">Component</option></select></label></div>';
+		echo '<label>' . esc_html__( 'Step', 'wootale-checkout-builder' ) . '<select id="wtcb-modal-step"></select></label></div>';
 		echo '<div class="wtcb-modal-grid"><label>' . esc_html__( 'Field Label', 'wootale-checkout-builder' ) . '<input type="text" id="wtcb-modal-label" /></label>';
 		echo '<label>' . esc_html__( 'Field Key / Name', 'wootale-checkout-builder' ) . '<input type="text" id="wtcb-modal-key" /></label></div>';
 		echo '<label>' . esc_html__( 'Default Value', 'wootale-checkout-builder' ) . '<input type="text" id="wtcb-modal-default" placeholder="e.g. ABC" /></label>';
 		echo '<label>' . esc_html__( 'Placeholder Text', 'wootale-checkout-builder' ) . '<input type="text" id="wtcb-modal-placeholder" placeholder="e.g. Enter your company name" /></label>';
-		echo '<label>' . esc_html__( 'Options', 'wootale-checkout-builder' ) . '<textarea id="wtcb-modal-options" rows="4" placeholder="One option per line"></textarea></label>';
-		echo '<label>' . esc_html__( 'Validation', 'wootale-checkout-builder' ) . '<select id="wtcb-modal-validation" multiple><option value="email">Email</option><option value="phone">Phone</option><option value="postcode">Postcode</option></select></label>';
+		echo '<div class="wtcb-option-editor"><strong>' . esc_html__( 'Options', 'wootale-checkout-builder' ) . '</strong><div id="wtcb-modal-options"></div><button type="button" class="button wtcb-add-option" data-add-option>+ ' . esc_html__( 'Add Option', 'wootale-checkout-builder' ) . '</button></div>';
+		echo '<label>' . esc_html__( 'Validation', 'wootale-checkout-builder' ) . '<select id="wtcb-modal-validation"><option value="">None</option><option value="email">Email</option><option value="phone">Phone</option><option value="postcode">Postcode</option></select></label>';
 		echo '<label>' . esc_html__( 'Field Width', 'wootale-checkout-builder' ) . '<select id="wtcb-modal-width"><option value="1">Half width - 1/2</option><option value="2">Full width - 2/2</option></select></label>';
 		echo '<div class="wtcb-toggle-row"><span><strong>' . esc_html__( 'Required field', 'wootale-checkout-builder' ) . '</strong><small>' . esc_html__( 'Customer must fill this out to complete checkout', 'wootale-checkout-builder' ) . '</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-modal-required" /><span></span></label></div>';
 		echo '<div class="wtcb-toggle-row"><span><strong>' . esc_html__( 'Enable field', 'wootale-checkout-builder' ) . '</strong><small>' . esc_html__( 'Show this field on the checkout page', 'wootale-checkout-builder' ) . '</small></span><label class="wtcb-switch"><input type="checkbox" id="wtcb-modal-enabled" /><span></span></label></div>';

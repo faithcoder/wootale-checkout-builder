@@ -266,6 +266,47 @@
     font-size: 13px;
     margin: 18px 0 10px;
 }
+.wtcb-component-accordion {
+    border-top: 1px solid #e5e7eb;
+    margin-top: 14px;
+    padding-top: 12px;
+}
+.wtcb-component-accordion summary {
+    align-items: center;
+    color: #111827;
+    cursor: pointer;
+    display: flex;
+    font-size: 13px;
+    font-weight: 700;
+    justify-content: space-between;
+    list-style: none;
+    margin-bottom: 10px;
+}
+.wtcb-component-accordion summary::-webkit-details-marker {
+    display: none;
+}
+.wtcb-component-accordion summary::after {
+    border-bottom: 2px solid #4b5563;
+    border-right: 2px solid #4b5563;
+    content: "";
+    height: 7px;
+    transform: rotate(45deg);
+    transition: transform 0.16s ease;
+    width: 7px;
+}
+.wtcb-component-accordion[open] summary::after {
+    transform: rotate(225deg);
+}
+.wtcb-component-group-title {
+    color: #6b7280;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    margin: 14px 0 8px;
+    text-transform: uppercase;
+}
+.wtcb-component-accordion summary + .wtcb-component-group-title {
+    margin-top: 4px;
+}
 .wtcb-search,
 .wtcb-settings select,
 .wtcb-step input,
@@ -759,8 +800,31 @@ button#wtcb-remove-selected-step {
 .wtcb-modal__body textarea {
     resize: vertical;
 }
-.wtcb-modal__body select[multiple] {
-    min-height: 86px;
+.wtcb-option-editor {
+    display: grid;
+    gap: 10px;
+}
+.wtcb-option-editor[hidden] {
+    display: none !important;
+}
+.wtcb-option-editor strong {
+    font-weight: 600;
+}
+.wtcb-option-row {
+    align-items: center;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) 32px 32px;
+}
+.wtcb-option-row input {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-sizing: border-box;
+    min-height: 40px;
+    width: 100%;
+}
+.wtcb-add-option {
+    justify-self: start;
 }
 .wtcb-toggle-row {
     align-items: center;

@@ -38,12 +38,13 @@ var rememberStep = document.getElementById('wtcb-remember-step');
 var modal = document.getElementById('wtcb-field-modal');
 var modalTitle = document.getElementById('wtcb-field-modal-title');
 var modalFieldType = document.getElementById('wtcb-modal-field-type');
-var modalSection = document.getElementById('wtcb-modal-section');
+var modalStep = document.getElementById('wtcb-modal-step');
 var modalLabel = document.getElementById('wtcb-modal-label');
 var modalKey = document.getElementById('wtcb-modal-key');
 var modalDefault = document.getElementById('wtcb-modal-default');
 var modalPlaceholder = document.getElementById('wtcb-modal-placeholder');
 var modalOptions = document.getElementById('wtcb-modal-options');
+var modalOptionEditor = document.querySelector('.wtcb-option-editor');
 var modalValidation = document.getElementById('wtcb-modal-validation');
 var modalWidth = document.getElementById('wtcb-modal-width');
 var modalRequired = document.getElementById('wtcb-modal-required');
@@ -175,6 +176,21 @@ function updateStepSettingsOptions(){
 	stepSettingsSelect.value = Number(selected) < steps.querySelectorAll('.wtcb-step').length ? selected : '0';
 	loadStepSettingsControls();
 }
+function updateModalStepOptions(selectedStep){
+	if (!modalStep) {
+		return;
+	}
+
+	modalStep.innerHTML = '';
+	steps.querySelectorAll('.wtcb-step').forEach(function(step, index){
+		var option = document.createElement('option');
+		var title = step.querySelector('.wtcb-step-title').value || ('Step ' + (index + 1));
+		option.value = String(index);
+		option.textContent = title;
+		modalStep.appendChild(option);
+	});
+	modalStep.value = String(selectedStep || 0);
+}
 function updateSelectedStepStyle(){
 	var step = selectedSettingsStep();
 
@@ -193,6 +209,54 @@ function updateSelectedStepStyle(){
 		margin: Number(stepMargin.value) || 0
 	});
 	serialize();
+}
+function optionValuesFromText(value){
+	return String(value || '').split(/\r?\n/).map(function(option){
+		return option.trim();
+	}).filter(Boolean);
+}
+function fieldTypeSupportsOptions(type){
+	return ['select', 'radio', 'checkbox'].indexOf(type) >= 0;
+}
+function refreshOptionEditor(){
+	if (!modalOptionEditor || !modalFieldType) {
+		return;
+	}
+
+	modalOptionEditor.hidden = !fieldTypeSupportsOptions(modalFieldType.value);
+}
+function optionValuesFromEditor(){
+	return Array.prototype.slice.call(modalOptions.querySelectorAll('.wtcb-option-value')).map(function(input){
+		return input.value.trim();
+	}).filter(Boolean);
+}
+function addOptionRow(value){
+	var row = document.createElement('div');
+	var input = document.createElement('input');
+	var edit = document.createElement('button');
+	var remove = document.createElement('button');
+
+	row.className = 'wtcb-option-row';
+	input.type = 'text';
+	input.className = 'wtcb-option-value';
+	input.value = value || '';
+	input.placeholder = 'Option label';
+	edit.type = 'button';
+	edit.className = 'wtcb-icon-button';
+	edit.dataset.editOption = '1';
+	edit.title = 'Edit option';
+	edit.textContent = '✎';
+	remove.type = 'button';
+	remove.className = 'wtcb-icon-button wtcb-danger';
+	remove.dataset.removeOption = '1';
+	remove.title = 'Remove option';
+	remove.textContent = '×';
+	row.append(input, edit, remove);
+	modalOptions.appendChild(row);
+}
+function renderOptionRows(value){
+	modalOptions.innerHTML = '';
+	optionValuesFromText(value).forEach(addOptionRow);
 }
 function removeSelectedStep(){
 	var step = selectedSettingsStep();
@@ -567,21 +631,21 @@ document.addEventListener('click', function(event){
 	if (event.target.matches('[data-open-field-settings]') && card) {
 		var field = parseField(card);
 		var display = displayOptions(field);
+		var currentStep = card.closest('.wtcb-step');
+		var currentStepIndex = Array.prototype.indexOf.call(steps.querySelectorAll('.wtcb-step'), currentStep);
 		activeCard = card;
 		modalTitle.textContent = 'Edit: ' + (field.label || field.key || 'Field');
 		modalFieldType.value = field.fieldType || 'text';
 		modalFieldType.disabled = field.type !== 'custom';
-		modalSection.value = field.section || 'order';
-		modalSection.disabled = field.type !== 'custom';
+		updateModalStepOptions(currentStepIndex >= 0 ? currentStepIndex : 0);
 		modalLabel.value = field.label || '';
 		modalKey.value = field.key || '';
 		modalKey.disabled = field.type !== 'custom';
 		modalDefault.value = field.default || '';
 		modalPlaceholder.value = field.placeholder || '';
-		modalOptions.value = field.options || '';
-		Array.prototype.forEach.call(modalValidation.options, function(option){
-			option.selected = (field.validation || []).indexOf(option.value) >= 0;
-		});
+		renderOptionRows(field.options || '');
+		refreshOptionEditor();
+		modalValidation.value = (field.validation || [])[0] || '';
 		modalWidth.value = String(fieldWidth(field));
 		modalRequired.checked = !!field.required;
 		modalEnabled.checked = field.enabled !== false;
@@ -601,18 +665,37 @@ document.addEventListener('click', function(event){
 	if (event.target.matches('[data-close-multistep-settings]')) {
 		multiStepModal.hidden = true;
 	}
+	if (event.target.matches('[data-add-option]')) {
+		if (!fieldTypeSupportsOptions(modalFieldType.value)) {
+			return;
+		}
+		addOptionRow('');
+		var rows = modalOptions.querySelectorAll('.wtcb-option-value');
+		if (rows.length) {
+			rows[rows.length - 1].focus();
+		}
+	}
+	if (event.target.matches('[data-edit-option]')) {
+		var optionInput = event.target.closest('.wtcb-option-row').querySelector('.wtcb-option-value');
+		if (optionInput) {
+			optionInput.focus();
+			optionInput.select();
+		}
+	}
+	if (event.target.matches('[data-remove-option]')) {
+		event.target.closest('.wtcb-option-row').remove();
+	}
 	if (event.target.matches('#wtcb-apply-field-settings') && activeCard) {
 		var next = parseField(activeCard);
 		next.label = modalLabel.value.trim() || next.label || next.key;
 		if (next.type === 'custom') {
 			next.fieldType = modalFieldType.value || 'text';
-			next.section = modalSection.value || 'order';
 			next.key = modalKey.value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '') || next.key;
 		}
 		next.default = modalDefault.value.trim();
 		next.placeholder = modalPlaceholder.value.trim();
-		next.options = modalOptions.value.trim();
-		next.validation = Array.prototype.filter.call(modalValidation.options, function(option){ return option.selected; }).map(function(option){ return option.value; });
+		next.options = fieldTypeSupportsOptions(next.fieldType || modalFieldType.value) ? optionValuesFromEditor().join('\n') : '';
+		next.validation = modalValidation.value ? [modalValidation.value] : [];
 		next.required = modalRequired.checked;
 		next.enabled = modalEnabled.checked;
 		next.width = Number(modalWidth.value) || 2;
@@ -622,6 +705,13 @@ document.addEventListener('click', function(event){
 			thankYou: modalDisplayThankYou.checked
 		};
 		setField(activeCard, next);
+		if (modalStep) {
+			var targetStep = steps.querySelectorAll('.wtcb-step')[Number(modalStep.value) || 0];
+			var targetList = targetStep ? targetStep.querySelector('[data-step-fields]') : null;
+			if (targetList && activeCard.parentNode !== targetList) {
+				targetList.appendChild(activeCard);
+			}
+		}
 		serialize();
 		modal.hidden = true;
 		activeCard = null;
@@ -683,6 +773,9 @@ document.addEventListener('change', function(event){
 });
 if (stepSettingsSelect) {
 	stepSettingsSelect.addEventListener('change', loadStepSettingsControls);
+}
+if (modalFieldType) {
+	modalFieldType.addEventListener('change', refreshOptionEditor);
 }
 [stepTitleColor, stepBackgroundColor, stepBorderStyle, stepBorderWidth, stepBorderRadius, stepBorderColor, stepPadding, stepMargin].forEach(function(control){
 	if (control) {
@@ -778,6 +871,9 @@ multiStepModal.addEventListener('click', function(event){
 document.addEventListener('input', function(event){
 	if (event.target.matches('.wtcb-step-title')) {
 		updateStepSettingsOptions();
+		if (!modal.hidden) {
+			updateModalStepOptions(modalStep ? Number(modalStep.value) || 0 : 0);
+		}
 	}
 	serialize();
 });
